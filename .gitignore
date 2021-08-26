@@ -37,6 +37,7 @@
 **.vcxproj.user
 **.user
 **.log
+*.pdb
 
 # Art
 Art/
@@ -58,3 +59,6 @@ Art/
 # Nuget packages
 Tools/ShaderBuildCommand/packages/
 **/ThirdParty/OpenSource/hlslparser/Ext/ShaderTranslator/packages/
+
+# Python
+**/__pycache__/
