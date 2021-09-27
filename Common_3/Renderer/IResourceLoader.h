@@ -74,6 +74,10 @@ typedef struct TextureLoadDesc
 	Texture** ppTexture;
 	/// Load empty texture
 	TextureDesc* pDesc;
+	/// Data provided by user
+	const void* pData;
+	/// Size of the pData (in bytes) 
+	uint64_t mSize;
 	/// Filename without extension. Extension will be determined based on mContainer
 	const char* pFileName;
 	/// Password for loading texture from encrypted files
