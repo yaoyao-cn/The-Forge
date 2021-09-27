@@ -881,6 +881,13 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 		char       fileName[FS_MAX_PATH] = {};
 		bool       success = false;
 
+		if (nullptr != pTextureDesc->pData)
+		{
+			ASSERT(pTextureDesc->mSize > 0);
+			fsOpenStreamFromMemory(pTextureDesc->pData, pTextureDesc->mSize, FM_READ_BINARY, false, &stream);
+			success = true;
+		}
+
 		TextureUpdateDescInternal updateDesc = {};
 		TextureContainerType      container = pTextureDesc->mContainer;
 		static const char*        extensions[] = { NULL, "dds", "ktx", "gnf", "basis", "svt" };
@@ -914,7 +921,10 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 			case TEXTURE_CONTAINER_DDS:
 			{
 #if defined(XBOX)
-				success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				if (nullptr == stream.pIO)
+				{
+					success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				}
 				uint32_t res = 1;
 				if (success)
 				{
@@ -926,7 +936,10 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 
 				return res ? UPLOAD_FUNCTION_RESULT_INVALID_REQUEST : UPLOAD_FUNCTION_RESULT_COMPLETED;
 #else
-				success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				if (nullptr == stream.pIO)
+				{
+					success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				}
 				if (success)
 				{
 					success = loadDDSTextureDesc(&stream, &textureDesc);
@@ -936,7 +949,10 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 			}
 			case TEXTURE_CONTAINER_KTX:
 			{
-				success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				if (nullptr == stream.pIO)
+				{
+					success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				}
 				if (success)
 				{
 					success = loadKTXTextureDesc(&stream, &textureDesc);
@@ -954,7 +970,10 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 			{
 				void*    data = NULL;
 				uint32_t dataSize = 0;
-				success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				if (nullptr == stream.pIO)
+				{
+					success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				}
 				if (success)
 				{
 					success = loadBASISTextureDesc(&stream, &textureDesc, &data, &dataSize);
@@ -969,7 +988,10 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 			case TEXTURE_CONTAINER_GNF:
 			{
 #if defined(ORBIS) || defined(PROSPERO)
-				success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				if (nullptr == stream.pIO)
+				{
+					success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+				}
 				uint32_t res = 1;
 				if (success)
 				{
