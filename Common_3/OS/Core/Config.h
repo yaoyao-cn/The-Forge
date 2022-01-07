@@ -215,7 +215,10 @@ COMPILE_ASSERT(sizeof(ssize_t) == sizeof(int64_t));
 
 #define ENABLE_LOGGING
 #define DEFAULT_LOG_LEVEL eALL
+
+#ifdef FORGE_DEBUG
 #define ENABLE_MEMORY_TRACKING
+#endif
 // #define ENABLE_FORGE_STACKTRACE_DUMP
 
 #ifdef AUTOMATED_TESTING
