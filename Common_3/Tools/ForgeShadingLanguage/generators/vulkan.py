@@ -308,6 +308,12 @@ def vulkan(fsl, dst):
                             out_postfix = '['+shader.input_patch_arg[1]+']'
                     if flat_modifier:
                         output_prefix = 'flat '+output_prefix
+
+                    # begin zhaoy modify
+                    if sem == 'SV_TARGET0':
+                        out_location = 0
+                    # end zhaoy modify
+                    
                     reference = ['layout(location = ', str(out_location),') ', output_prefix, 'out(', elem_dtype, ') ', output_datapath, out_postfix, ';']
                 
 
