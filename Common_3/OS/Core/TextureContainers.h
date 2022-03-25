@@ -798,7 +798,8 @@ static bool loadBASISTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, voi
 	basist::basisu_file_info fileinfo;
 	if (!decoder.get_file_info(basisData, (uint32_t)memSize, fileinfo))
 	{
-		LOGF(LogLevel::eERROR, "Failed retrieving Basis file information!");
+        LOGF(LogLevel::eERROR, "Failed retrieving Basis file information!");
+        tf_free(basisData);
 		return false;
 	}
 
@@ -879,7 +880,9 @@ static bool loadBASISTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, voi
 			uint32_t rowPitch = 0;
 			uint32_t numBytes = 0;
 			if (!util_get_surface_info(w, h, textureDesc.mFormat, &numBytes, &rowPitch, NULL))
-			{
+            {
+                tf_free(basisData);
+                tf_free(startData);
 				return false;
 			}
 
