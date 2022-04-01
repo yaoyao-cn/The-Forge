@@ -63,6 +63,12 @@
 #include "../ThirdParty/OpenSource/murmurhash3/MurmurHash3_32.h"
 #endif
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_MALLOC(sz)           tf_malloc(sz)
+#define STBI_REALLOC(p,newsz)     tf_realloc(p,newsz)
+#define STBI_FREE(p)              tf_free(p)
+#include "../ThirdParty/OpenSource/Nothings/stb_image.h"
+
 struct SubresourceDataDesc
 {
 	uint64_t mSrcOffset;
@@ -885,7 +891,7 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 
 		TextureUpdateDescInternal updateDesc = {};
 		TextureContainerType      container = pTextureDesc->mContainer;
-		static const char*        extensions[] = { NULL, "dds", "ktx", "gnf", "basis", "svt" };
+		static const char*        extensions[] = { NULL, "dds", "ktx", "gnf", "basis", "svt", ""};
 
 		if (TEXTURE_CONTAINER_DEFAULT == container)
 		{
@@ -980,6 +986,61 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 				}
 				break;
 			}
+			case TEXTURE_CONTAINER_AUTO_DETECT:
+            {
+                void* data = NULL;
+                uint32_t dataSize = 0;
+                if (nullptr == stream.pIO)
+                {
+                    success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+                }
+                if (success)
+                {
+                    //dds
+                    fsSeekStream(&stream, SBO_START_OF_FILE, 0);
+                    success = loadDDSTextureDesc(&stream, &textureDesc);
+					if (success)
+					{
+						break;
+					}
+
+                    //ktx
+                    fsSeekStream(&stream, SBO_START_OF_FILE, 0);
+                    success = loadKTXTextureDesc(&stream, &textureDesc);
+					if (success)
+                    {
+                        updateDesc.mMipsAfterSlice = true;
+                        // KTX stores mip size before the mip data
+                        // This function gets called to skip the mip size so we read the mip data
+                        updateDesc.pPreMipFunc = [](FileStream* pStream, uint32_t) {
+                            uint32_t mipSize = 0;
+                            fsReadFromStream(pStream, &mipSize, sizeof(mipSize));
+                        };
+						break;
+					}
+
+                    //basis
+                    fsSeekStream(&stream, SBO_START_OF_FILE, 0);
+                    success = loadBASISTextureDesc(&stream, &textureDesc, &data, &dataSize);
+                    if (success)
+                    {
+                        fsCloseStream(&stream);
+                        fsOpenStreamFromMemory(data, dataSize, FM_READ_BINARY, true, &stream);
+						break;
+                    }
+
+                    //auto
+                    fsSeekStream(&stream, SBO_START_OF_FILE, 0);
+                    success = loadAutoTextureDesc(&stream, &textureDesc, &data, &dataSize);
+                    if (success)
+                    {
+                        fsCloseStream(&stream);
+                        fsOpenStreamFromMemory(data, dataSize, FM_READ_BINARY, true, &stream);
+                    }
+					break;
+                }
+                break;
+            }
 			case TEXTURE_CONTAINER_GNF:
 			{
 #if defined(ORBIS) || defined(PROSPERO)
