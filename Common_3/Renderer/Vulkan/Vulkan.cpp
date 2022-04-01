@@ -3207,6 +3207,8 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
 		vulkanFunctions.vkFlushMappedMemoryRanges = vkFlushMappedMemoryRanges;
 		vulkanFunctions.vkInvalidateMappedMemoryRanges = vkInvalidateMappedMemoryRanges;
 		vulkanFunctions.vkCmdCopyBuffer = vkCmdCopyBuffer;
+        vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+        vulkanFunctions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
 
 		createInfo.pVulkanFunctions = &vulkanFunctions;
 		createInfo.pAllocationCallbacks = &gVkAllocationCallbacks;
@@ -7806,10 +7808,12 @@ void vk_calculateMemoryStats(Renderer* pRenderer, char** stats) { vmaBuildStatsS
 
 void vk_calculateMemoryUse(Renderer* pRenderer, uint64_t* usedBytes, uint64_t* totalAllocatedBytes)
 {
-	VmaStats stats;
-	pRenderer->mVulkan.pVmaAllocator->CalculateStats(&stats);
-	*usedBytes = stats.total.usedBytes;
-	*totalAllocatedBytes = *usedBytes + stats.total.unusedBytes;
+	//TODO: Verify that it is correct
+	assert(false);
+	VmaTotalStatistics stats;
+	pRenderer->mVulkan.pVmaAllocator->CalculateStatistics(&stats);
+	*usedBytes = stats.total.statistics.allocationBytes;
+	*totalAllocatedBytes = stats.total.statistics.blockBytes;
 }
 
 void vk_freeMemoryStats(Renderer* pRenderer, char* stats) { vmaFreeStatsString(pRenderer->mVulkan.pVmaAllocator, stats); }
