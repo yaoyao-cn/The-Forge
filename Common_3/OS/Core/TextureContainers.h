@@ -39,6 +39,8 @@
 
 #include "../../ThirdParty/OpenSource/basis_universal/transcoder/basisu_transcoder.h"
 
+#include "../../ThirdParty/OpenSource/Nothings/stb_image.h"
+
 /************************************************************************/
 // Surface Utils
 /************************************************************************/
@@ -977,3 +979,88 @@ if (!(exp))                   \
 	return true;
 }
 #endif
+/************************************************************************/
+// Auto Texture Loading with stb_image
+/************************************************************************/
+// fill 'data' with 'size' bytes.  return number of bytes actually read
+static int FileStream_read(void* user, char* data, int size)
+{
+	return (int)fsReadFromStream((FileStream*)user, data, size);
+}
+// skip the next 'n' bytes, or 'unget' the last -n bytes if negative
+static void FileStream_skip(void* user, int n)
+{
+	fsSeekStream((FileStream*)user, SBO_CURRENT_POSITION, n);
+}
+// returns nonzero if we are at end of file/data
+static int FileStream_eof(void* user)
+{
+	return fsStreamAtEnd((FileStream*)user) ? 1 : 0;
+}
+
+static bool loadAutoTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, void** ppOutData, uint32_t* pOutDataSize)
+{
+	if (pStream == NULL || fsGetStreamFileSize(pStream) <= 0)
+		return false;
+
+	static stbi_io_callbacks io_callbacks = { FileStream_read, FileStream_skip, FileStream_eof };
+
+	int x = 0, y = 0, comp = 0;
+	if (!stbi_info_from_callbacks(&io_callbacks, pStream, &x, &y, &comp))
+	{
+		return false;
+	}
+	fsSeekStream(pStream, SBO_START_OF_FILE, 0);
+
+	int chennels = comp == 3 ? 4 : comp;
+
+	auto data = stbi_load_from_callbacks(&io_callbacks, pStream, &x, &y, nullptr, chennels); //force 4 chennels
+
+	TextureDesc& textureDesc = *pOutDesc;
+	textureDesc.mWidth = x;
+	textureDesc.mHeight = y;
+	textureDesc.mDepth = 1;
+	textureDesc.mMipLevels = 1;
+	textureDesc.mArraySize = 1;
+	textureDesc.mSampleCount = SAMPLE_COUNT_1;
+	textureDesc.mDescriptors = DESCRIPTOR_TYPE_TEXTURE;
+	textureDesc.mFormat = TinyImageFormat_UNDEFINED;
+	switch (chennels)
+	{
+	case 1:
+		textureDesc.mFormat = TinyImageFormat_R8_UNORM;
+		break;
+	case 2:
+		textureDesc.mFormat = TinyImageFormat_R8G8_UNORM;
+		break;
+	case 3:
+		textureDesc.mFormat = TinyImageFormat_R8G8B8_UNORM;
+		break;
+	case 4:
+		textureDesc.mFormat = TinyImageFormat_R8G8B8A8_UNORM;
+		break;
+	default:
+		ASSERT(false);
+		break;
+	}
+
+	size_t   requiredSize = x * y * chennels;
+	uint32_t rowPitch = 0;
+	uint32_t numBytes = 0;
+	if (!util_get_surface_info(x, y, textureDesc.mFormat, &numBytes, &rowPitch, NULL) || requiredSize != numBytes)
+	{
+		stbi_image_free(data);
+		return false;
+	}
+
+	/*
+	* assign data to *ppOutData is safe(see ResourceLoader.cpp)
+	* #define STBI_MALLOC(sz)           tf_malloc(sz)
+	* #define STBI_REALLOC(p,newsz)     tf_realloc(p,newsz)
+	* #define STBI_FREE(p)              tf_free(p)
+	*/
+	*ppOutData = data;
+	*pOutDataSize = (uint32_t)requiredSize;
+
+	return true;
+}

@@ -55,7 +55,9 @@ typedef enum TextureContainerType
 	/// .basis
 	TEXTURE_CONTAINER_BASIS,
 	/// .svt
-	TEXTURE_CONTAINER_SVT,
+    TEXTURE_CONTAINER_SVT,
+    /// auto detect
+    TEXTURE_CONTAINER_AUTO_DETECT
 } TextureContainerType;
 
 // MARK: - Resource Loading
