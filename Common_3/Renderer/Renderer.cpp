@@ -186,6 +186,7 @@ DECLARE_INTERNAL_RENDERER_FUNCTION(void, addTexture, Renderer* pRenderer, const 
 DECLARE_INTERNAL_RENDERER_FUNCTION(void, removeTexture, Renderer* pRenderer, Texture* pTexture)
 DECLARE_INTERNAL_RENDERER_FUNCTION(void, addVirtualTexture, Cmd* pCmd, const TextureDesc* pDesc, Texture** ppTexture, void* pImageData)
 DECLARE_INTERNAL_RENDERER_FUNCTION(void, removeVirtualTexture, Renderer* pRenderer, VirtualTexture* pTexture)
+DECLARE_INTERNAL_RENDERER_FUNCTION(void, generateMipmaps, Cmd* pCmd, Texture* pTexture)
 
 /************************************************************************/
 // Internal initialization settings

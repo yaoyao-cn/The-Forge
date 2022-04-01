@@ -643,6 +643,9 @@ typedef enum TextureCreationFlags
     TEXTURE_CREATION_FLAG_VR_MULTIVIEW = 0x4000,
     /// Binds the FFR fragment density if this texture is used as a render target.
     TEXTURE_CREATION_FLAG_VR_FOVEATED_RENDERING = 0x8000,
+    
+	/// Generate Mipmaps
+    TEXTURE_CREATION_FLAG_GENERATE_MIPMAPS = 0x10000,
 } TextureCreationFlags;
 MAKE_ENUM_FLAG(uint32_t, TextureCreationFlags)
 

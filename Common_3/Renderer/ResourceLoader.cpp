@@ -101,6 +101,7 @@ DECLARE_RENDERER_FUNCTION(
 DECLARE_RENDERER_FUNCTION(void, addTexture, Renderer* pRenderer, const TextureDesc* pDesc, Texture** ppTexture)
 DECLARE_RENDERER_FUNCTION(void, removeTexture, Renderer* pRenderer, Texture* pTexture)
 DECLARE_RENDERER_FUNCTION(void, addVirtualTexture, Cmd* pCmd, const TextureDesc* pDesc, Texture** ppTexture, void* pImageData)
+DECLARE_RENDERER_FUNCTION(void, generateMipmaps, Cmd* pCmd, Texture* pTexture)
 
 extern RendererApi gSelectedRendererApi;
 
@@ -346,7 +347,9 @@ typedef struct TextureUpdateDescInternal
 	uint32_t          mBaseArrayLayer;
 	uint32_t          mLayerCount;
 	PreMipStepFn      pPreMipFunc;
-	bool              mMipsAfterSlice;
+    bool              mMipsAfterSlice;
+    bool              mGenerateMipmaps;
+    uint32_t          mMipLevelsToGenerate;
 } TextureUpdateDescInternal;
 
 typedef struct CopyResourceSet
@@ -520,7 +523,16 @@ static MappedMemoryRange allocateUploadMemory(Renderer* pRenderer, uint64_t memo
 
 static void setupCopyEngine(Renderer* pRenderer, CopyEngine* pCopyEngine, uint32_t nodeIndex, uint64_t size, uint32_t bufferCount)
 {
-	QueueDesc desc = { QUEUE_TYPE_TRANSFER, QUEUE_FLAG_NONE, QUEUE_PRIORITY_NORMAL, nodeIndex };
+    QueueType queue_type = QUEUE_TYPE_TRANSFER;
+#if defined(VULKAN)
+    if (gSelectedRendererApi == RENDERER_API_VULKAN)
+    {
+        // use QUEUE_TYPE_GRAPHICS to generate mipmap
+        queue_type = QUEUE_TYPE_GRAPHICS;
+    }
+#endif
+
+    QueueDesc desc = { queue_type, QUEUE_FLAG_NONE, QUEUE_PRIORITY_NORMAL, nodeIndex };
 	addQueue(pRenderer, &desc, &pCopyEngine->pQueue);
 
 	const uint64_t maxBlockSize = 32;
@@ -851,11 +863,18 @@ static UploadFunctionResult
 	}
 
 #if defined(VULKAN)
-	if (gSelectedRendererApi == RENDERER_API_VULKAN)
+    if (gSelectedRendererApi == RENDERER_API_VULKAN && !texUpdateDesc.mGenerateMipmaps)
 	{
 		barrier = { texture, RESOURCE_STATE_COPY_DEST, RESOURCE_STATE_SHADER_RESOURCE };
 		cmdResourceBarrier(cmd, 0, NULL, 1, &barrier, 0, NULL);
 	}
+#endif
+
+#if defined(VULKAN)
+    if (gSelectedRendererApi == RENDERER_API_VULKAN && texUpdateDesc.mGenerateMipmaps)
+    {
+        generateMipmaps(cmd, texture);
+    }
 #endif
 
 	if (stream.pIO)
@@ -864,6 +883,17 @@ static UploadFunctionResult
 	}
 
 	return UPLOAD_FUNCTION_RESULT_COMPLETED;
+}
+
+static int CalculateMipLevels(int size)
+{
+    int level = 1;
+    while (size > 1)
+    {
+        ++level;
+        size = size >> 1;
+    }
+    return level;
 }
 
 static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEngine, size_t activeSet, const UpdateRequest& pTextureUpdate)
@@ -1085,9 +1115,32 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 #if defined(VULKAN)
 			if (NULL != pTextureDesc->pDesc)
 				textureDesc.pVkSamplerYcbcrConversionInfo = pTextureDesc->pDesc->pVkSamplerYcbcrConversionInfo;
-#endif
-			addTexture(pRenderer, &textureDesc, pTextureDesc->ppTexture);
 
+            if (gSelectedRendererApi == RENDERER_API_VULKAN && 1 == textureDesc.mMipLevels && pTextureDesc->mCreationFlag & TEXTURE_CREATION_FLAG_GENERATE_MIPMAPS)
+            {
+                ASSERT(textureDesc.mDepth == 1);
+                int mipLevels = CalculateMipLevels(max(textureDesc.mWidth, textureDesc.mHeight));
+                if (mipLevels > 1)
+                {
+                    updateDesc.mGenerateMipmaps = true;
+                    updateDesc.mMipLevelsToGenerate = mipLevels;
+                }
+            }
+#endif
+
+#if defined(VULKAN)
+            if (gSelectedRendererApi == RENDERER_API_VULKAN && updateDesc.mGenerateMipmaps)
+            {
+                ASSERT(1 == textureDesc.mMipLevels);
+                textureDesc.mMipLevels = updateDesc.mMipLevelsToGenerate;
+                addTexture(pRenderer, &textureDesc, pTextureDesc->ppTexture);
+                textureDesc.mMipLevels = 1;
+            }
+            else
+                addTexture(pRenderer, &textureDesc, pTextureDesc->ppTexture);
+#else
+            addTexture(pRenderer, &textureDesc, pTextureDesc->ppTexture);
+#endif
 			updateDesc.mStream = stream;
 			updateDesc.pTexture = *pTextureDesc->ppTexture;
 			updateDesc.mBaseMipLevel = 0;
