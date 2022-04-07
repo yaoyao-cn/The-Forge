@@ -1,0 +1,5 @@
+<map id="ktxTexture_vtbl" name="ktxTexture_vtbl">
+<area shape="rect" id="node1" title="Table of virtual ktxTexture methods." alt="" coords="5,5,115,32"/>
+<area shape="rect" id="node2" href="$structktxTexture.html" title="Base class representing a texture." alt="" coords="47,241,129,268"/>
+<area shape="rect" id="node3" href="$classktxHashList.html" title="Opaque handle to a ktxHashList." alt="" coords="235,5,325,32"/>
+</map>

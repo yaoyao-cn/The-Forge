@@ -39,6 +39,8 @@
 
 #include "../../ThirdParty/OpenSource/basis_universal/transcoder/basisu_transcoder.h"
 
+#include "../../ThirdParty/OpenSource/KTX-Software/include/ktx.h"
+
 #include "../../ThirdParty/OpenSource/Nothings/stb_image.h"
 
 /************************************************************************/
@@ -786,6 +788,7 @@ if (!(exp))                   \
 /************************************************************************/
 static bool loadBASISTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, void** ppOutData, uint32_t* pOutDataSize)
 {
+#if 0
 	if (pStream == NULL || fsGetStreamFileSize(pStream) <= 0)
 		return false;
 
@@ -933,7 +936,145 @@ static bool loadBASISTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, voi
 	*ppOutData = startData;
 	*pOutDataSize = requiredSize;
 
-	return true;
+    return true;
+#else
+	return false;
+#endif
+}
+/************************************************************************/
+// KTX2 Loading
+/************************************************************************/
+static bool loadKTX2TextureDesc(FileStream* pStream, TextureDesc* pOutDesc, void** ppOutData, uint32_t* pOutDataSize)
+{
+    if (pStream == NULL || fsGetStreamFileSize(pStream) <= 0)
+        return false;
+
+    size_t memSize = (size_t)fsGetStreamFileSize(pStream);
+    void* fileData = tf_malloc(memSize);
+    fsReadFromStream(pStream, fileData, memSize);
+
+    ktxTexture2* texture = nullptr;
+	KTX_error_code result;
+	result = ktxTexture2_CreateFromMemory((ktx_uint8_t*)fileData, memSize, KTX_TEXTURE_CREATE_NO_FLAGS, &texture);
+	if (KTX_SUCCESS != result)
+    {
+        LOGF(LogLevel::eERROR, "ktxTexture2_CreateFromMemory failed");
+        tf_free(fileData);
+        return false;
+	}
+
+    TextureDesc& textureDesc = *pOutDesc;
+    textureDesc.mWidth = texture->baseWidth;
+    textureDesc.mHeight = texture->baseHeight;
+    textureDesc.mDepth = texture->baseDepth;
+    textureDesc.mMipLevels = texture->numLevels;
+    textureDesc.mArraySize = texture->numLayers;
+    textureDesc.mSampleCount = SAMPLE_COUNT_1;
+    textureDesc.mDescriptors = DESCRIPTOR_TYPE_TEXTURE;
+    textureDesc.mFormat = TinyImageFormat_UNDEFINED;
+	if (texture->isCubemap)
+	{
+		ASSERT(texture->numFaces == 6);
+		textureDesc.mArraySize *= 6;
+        textureDesc.mDescriptors |= DESCRIPTOR_TYPE_TEXTURE_CUBE;
+	}
+
+	if (ktxTexture2_NeedsTranscoding(texture))
+	{
+		ktx_texture_transcode_fmt_e tf;
+
+        bool isSRGB = (pOutDesc->mFlags & TEXTURE_CREATION_FLAG_SRGB) != 0;
+
+#if defined(TARGET_IOS) || defined(__ANDROID__) || defined(NX64)
+#if defined(TARGET_IOS)
+        // Use PVRTC on iOS whenever possible
+        // This makes sure that PVRTC support is maintained
+        if (isPowerOf2(textureDesc.mWidth) && isPowerOf2(textureDesc.mHeight))
+        {
+            textureDesc.mFormat = isSRGB ? TinyImageFormat_PVRTC1_4BPP_SRGB : TinyImageFormat_PVRTC1_4BPP_UNORM;
+			tf = KTX_TTF_PVRTC1_4_RGBA;
+        }
+#endif
+        if (TinyImageFormat_UNDEFINED == textureDesc.mFormat)
+        {
+            textureDesc.mFormat = isSRGB ? TinyImageFormat_ASTC_4x4_SRGB : TinyImageFormat_ASTC_4x4_UNORM;
+			tf = KTX_TTF_ASTC_4x4_RGBA;
+        }
+#else
+		textureDesc.mFormat = isSRGB ? TinyImageFormat_DXBC7_SRGB : TinyImageFormat_DXBC7_UNORM;
+		tf = KTX_TTF_BC7_RGBA;
+#endif
+
+		result = ktxTexture2_TranscodeBasis(texture, tf, 0);
+	}
+
+    uint32_t requiredSize = util_get_surface_size(textureDesc.mFormat,
+        textureDesc.mWidth, textureDesc.mHeight, textureDesc.mDepth, 1, 1,
+        0, textureDesc.mMipLevels,
+        0, textureDesc.mArraySize);
+    void* startData = tf_malloc(requiredSize);
+    uint8_t* data = (uint8_t*)startData;
+
+    for (uint32_t s = 0; s < textureDesc.mArraySize; ++s)
+    {
+        uint32_t w = textureDesc.mWidth;
+        uint32_t h = textureDesc.mHeight;
+        uint32_t d = textureDesc.mDepth;
+
+		uint32_t array_layers = s / texture->numFaces;
+		uint32_t face_slice = s % texture->numFaces;
+
+        for (uint32_t m = 0; m < textureDesc.mMipLevels; ++m)
+        {
+            ASSERT(data < (uint8_t*)startData + requiredSize);
+
+            uint32_t rowPitch = 0;
+            uint32_t numBytes = 0;
+            if (!util_get_surface_info(w, h, textureDesc.mFormat, &numBytes, &rowPitch, NULL))
+            {
+                ktxTexture_Destroy((ktxTexture*)texture);
+                tf_free(fileData);
+                tf_free(startData);
+                return false;
+            }
+
+            ktx_size_t offset;
+            result = ktxTexture_GetImageOffset((ktxTexture*)texture, m, array_layers, face_slice, &offset);
+            if (KTX_SUCCESS != result)
+            {
+                LOGF(LogLevel::eERROR, "ktxTexture_GetImageOffset failed: (%u %u)!", s, m);
+                ktxTexture_Destroy((ktxTexture*)texture);
+                tf_free(fileData);
+                tf_free(startData);
+                return false;
+            }
+            auto image = ktxTexture_GetData((ktxTexture*)texture) + offset;
+			memcpy(data, image, numBytes);
+            data += numBytes;
+
+            w = w >> 1;
+            h = h >> 1;
+            d = d >> 1;
+            if (w == 0)
+            {
+                w = 1;
+            }
+            if (h == 0)
+            {
+                h = 1;
+            }
+            if (d == 0)
+            {
+                d = 1;
+            }
+        }
+    }
+
+    ktxTexture_Destroy((ktxTexture*)texture);
+    tf_free(fileData);
+    *ppOutData = startData;
+    *pOutDataSize = requiredSize;
+    return true;
 }
 /************************************************************************/
 // SVT Loading

@@ -921,7 +921,7 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 
 		TextureUpdateDescInternal updateDesc = {};
 		TextureContainerType      container = pTextureDesc->mContainer;
-		static const char*        extensions[] = { NULL, "dds", "ktx", "gnf", "basis", "svt", ""};
+		static const char*        extensions[] = { NULL, "dds", "ktx", "ktx2", "gnf", "basis", "svt", ""};
 
 		if (TEXTURE_CONTAINER_DEFAULT == container)
 		{
@@ -1016,6 +1016,25 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 				}
 				break;
 			}
+            case TEXTURE_CONTAINER_KTX2:
+            {
+                void* data = NULL;
+                uint32_t dataSize = 0;
+                if (nullptr == stream.pIO)
+                {
+                    success = fsOpenStreamFromPath(RD_TEXTURES, fileName, FM_READ_BINARY, pTextureDesc->pFilePassword, &stream);
+                }
+                if (success)
+                {
+                    success = loadKTX2TextureDesc(&stream, &textureDesc, &data, &dataSize);
+                    if (success)
+                    {
+                        fsCloseStream(&stream);
+                        fsOpenStreamFromMemory(data, dataSize, FM_READ_BINARY, true, &stream);
+                    }
+                }
+                break;
+            }
 			case TEXTURE_CONTAINER_AUTO_DETECT:
             {
                 void* data = NULL;
@@ -1026,6 +1045,16 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
                 }
                 if (success)
                 {
+                    //ktx2
+                    fsSeekStream(&stream, SBO_START_OF_FILE, 0);
+                    success = loadKTX2TextureDesc(&stream, &textureDesc, &data, &dataSize);
+                    if (success)
+                    {
+                        fsCloseStream(&stream);
+                        fsOpenStreamFromMemory(data, dataSize, FM_READ_BINARY, true, &stream);
+                        break;
+                    }
+
                     //dds
                     fsSeekStream(&stream, SBO_START_OF_FILE, 0);
                     success = loadDDSTextureDesc(&stream, &textureDesc);
