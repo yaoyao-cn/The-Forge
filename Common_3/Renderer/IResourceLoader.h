@@ -49,7 +49,9 @@ typedef enum TextureContainerType
 	/// .dds
 	TEXTURE_CONTAINER_DDS,
 	/// .ktx
-	TEXTURE_CONTAINER_KTX,
+    TEXTURE_CONTAINER_KTX,
+    /// .ktx2
+    TEXTURE_CONTAINER_KTX2,
 	/// .gnf
 	TEXTURE_CONTAINER_GNF,
 	/// .basis

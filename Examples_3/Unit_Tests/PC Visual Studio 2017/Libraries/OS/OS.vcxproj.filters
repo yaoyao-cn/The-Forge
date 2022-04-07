@@ -590,6 +590,9 @@
     <ClCompile Include="..\..\..\..\..\Common_3\OS\WindowSystem\WindowSystem.cpp">
       <Filter>OS\WindowSystem</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\basis_universal\zstd\zstddeclib.c">
+      <Filter>Dependencies\basisu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\EASTL\EASTL.natvis">
