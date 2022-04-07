@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\..\..\..\Common_3\OS\Windows\WindowsTime.c" />
     <ClCompile Include="..\..\..\..\..\Common_3\OS\Windows\WindowsWindow.cpp" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\basis_universal\transcoder\basisu_transcoder.cpp" />
+    <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\basis_universal\zstd\zstddeclib.c" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\cpu_features\src\impl_x86_windows.c" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\EASTL\allocator_forge.cpp" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\EASTL\assert.cpp" />

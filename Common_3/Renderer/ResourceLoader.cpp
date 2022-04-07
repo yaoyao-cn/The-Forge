@@ -2097,6 +2097,8 @@ static void addResourceLoader(Renderer** ppRenderers, uint32_t rendererCount, Re
 	gUma = gSelectedRendererApi == RENDERER_API_VULKAN;
 #endif
 
+	basist::basisu_transcoder_init();
+
 	// Create dedicated resource loader thread.
 	if (!pLoader->mDesc.mSingleThreaded)
 	{

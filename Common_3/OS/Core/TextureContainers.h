@@ -787,13 +787,11 @@ inline bool loadBASISTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, voi
 	if (pStream == NULL || fsGetStreamFileSize(pStream) <= 0)
 		return false;
 
-	basist::etc1_global_selector_codebook sel_codebook(basist::g_global_selector_cb_size, basist::g_global_selector_cb);
-
 	size_t memSize = (size_t)fsGetStreamFileSize(pStream);
 	void* basisData = tf_malloc(memSize);
 	fsReadFromStream(pStream, basisData, memSize);
 
-	basist::basisu_transcoder decoder(&sel_codebook);
+	basist::basisu_transcoder decoder;
 
 	basist::basisu_file_info fileinfo;
 	if (!decoder.get_file_info(basisData, (uint32_t)memSize, fileinfo))
