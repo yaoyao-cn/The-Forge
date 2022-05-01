@@ -5022,8 +5022,19 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 
 	if (VK_NULL_HANDLE != pRootSignature->mVulkan.mVkDescriptorSetLayouts[updateFreq])
 	{
-		VkDescriptorSetLayout* pLayouts = (VkDescriptorSetLayout*)alloca(pDesc->mMaxSets * sizeof(VkDescriptorSetLayout));
-		VkDescriptorSet**      pHandles = (VkDescriptorSet**)alloca(pDesc->mMaxSets * sizeof(VkDescriptorSet*));
+        VkDescriptorSetLayout* pLayouts = NULL;
+        VkDescriptorSet** pHandles = NULL;
+        bool large_set = pDesc->mMaxSets > 128;
+        if (large_set)
+        {
+            pLayouts = (VkDescriptorSetLayout*)tf_malloc(pDesc->mMaxSets * sizeof(VkDescriptorSetLayout));
+            pHandles = (VkDescriptorSet**)tf_malloc(pDesc->mMaxSets * sizeof(VkDescriptorSet*));
+        }
+        else
+        {
+            pLayouts = (VkDescriptorSetLayout*)alloca(pDesc->mMaxSets * sizeof(VkDescriptorSetLayout));
+            pHandles = (VkDescriptorSet**)alloca(pDesc->mMaxSets * sizeof(VkDescriptorSet*));
+        }
 
 		for (uint32_t i = 0; i < pDesc->mMaxSets; ++i)
 		{
@@ -5128,7 +5139,13 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 					break;
 				}
 			}
-		}
+        }
+
+        if (large_set)
+        {
+            tf_free(pHandles);
+            tf_free(pLayouts);
+        }
 	}
 	else
 	{
