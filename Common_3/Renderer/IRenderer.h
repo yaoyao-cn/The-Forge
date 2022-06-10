@@ -1699,7 +1699,6 @@ typedef struct DEFINE_ALIGNED(DescriptorSet, 64)
 		{
 			VkDescriptorSet*             pHandles;
 			const RootSignature*         pRootSignature;
-			uint8_t*                     pDescriptorData;
 			struct DynamicUniformData*   pDynamicUniformData;
 			VkDescriptorPool             pDescriptorPool;
 			uint32_t                     mMaxSets;
