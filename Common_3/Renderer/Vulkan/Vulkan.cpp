@@ -5001,7 +5001,6 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 	if (VK_NULL_HANDLE != pRootSignature->mVulkan.mVkDescriptorSetLayouts[updateFreq])
 	{
 		totalSize += pDesc->mMaxSets * sizeof(VkDescriptorSet);
-		totalSize += descriptorMemSize;
 	}
 
 	totalSize += pDesc->mMaxSets * dynamicOffsetCount * sizeof(DynamicUniformData);
@@ -5017,8 +5016,6 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 	uint8_t* pMem = (uint8_t*)(pDescriptorSet + 1);
 	pDescriptorSet->mVulkan.pHandles = (VkDescriptorSet*)pMem;
 	pMem += pDesc->mMaxSets * sizeof(VkDescriptorSet);
-	pDescriptorSet->mVulkan.pDescriptorData = (uint8_t*)pMem;
-	pMem += descriptorMemSize;
 
 	if (VK_NULL_HANDLE != pRootSignature->mVulkan.mVkDescriptorSetLayouts[updateFreq])
 	{
@@ -5035,6 +5032,8 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
             pLayouts = (VkDescriptorSetLayout*)alloca(pDesc->mMaxSets * sizeof(VkDescriptorSetLayout));
             pHandles = (VkDescriptorSet**)alloca(pDesc->mMaxSets * sizeof(VkDescriptorSet*));
         }
+
+		uint8_t* descriptorUpdateData = (uint8_t*)alloca(descriptorMemSize);
 
 		for (uint32_t i = 0; i < pDesc->mMaxSets; ++i)
 		{
@@ -5080,7 +5079,7 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 				{
 				case DESCRIPTOR_TYPE_SAMPLER:
 				{
-					VkDescriptorImageInfo* updateData = (VkDescriptorImageInfo*)pDescriptorSet->mVulkan.pDescriptorData;
+					VkDescriptorImageInfo* updateData = (VkDescriptorImageInfo*)descriptorUpdateData;
 					writeSet.pImageInfo = updateData;
 					for (uint32_t arr = 0; arr < descInfo->mSize; ++arr)
 					{
@@ -5096,7 +5095,7 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 						pRenderer->pNullDescriptors->pDefaultTextureUAV[nodeIndex][descInfo->mDim]->mVulkan.pVkUAVDescriptors[0] :
 						pRenderer->pNullDescriptors->pDefaultTextureSRV[nodeIndex][descInfo->mDim]->mVulkan.pVkSRVDescriptor;
 					VkImageLayout layout = (type == DESCRIPTOR_TYPE_RW_TEXTURE) ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-					VkDescriptorImageInfo* updateData = (VkDescriptorImageInfo*)pDescriptorSet->mVulkan.pDescriptorData;
+					VkDescriptorImageInfo* updateData = (VkDescriptorImageInfo*)descriptorUpdateData;
 					writeSet.pImageInfo = updateData;
 					for (uint32_t arr = 0; arr < descInfo->mSize; ++arr)
 					{
@@ -5111,7 +5110,7 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 				case DESCRIPTOR_TYPE_RW_BUFFER_RAW:
 				case DESCRIPTOR_TYPE_UNIFORM_BUFFER:
 				{
-					VkDescriptorBufferInfo* updateData = (VkDescriptorBufferInfo*)pDescriptorSet->mVulkan.pDescriptorData;
+					VkDescriptorBufferInfo* updateData = (VkDescriptorBufferInfo*)descriptorUpdateData;
 					writeSet.pBufferInfo = updateData;
 					for (uint32_t arr = 0; arr < descInfo->mSize; ++arr)
 					{
@@ -5126,7 +5125,7 @@ void vk_addDescriptorSet(Renderer* pRenderer, const DescriptorSetDesc* pDesc, De
 					VkBufferView srcView = (type == DESCRIPTOR_TYPE_RW_TEXEL_BUFFER) ?
 						pRenderer->pNullDescriptors->pDefaultBufferUAV[nodeIndex]->mVulkan.pVkStorageTexelView :
 						pRenderer->pNullDescriptors->pDefaultBufferSRV[nodeIndex]->mVulkan.pVkUniformTexelView;
-					VkBufferView* updateData = (VkBufferView*)pDescriptorSet->mVulkan.pDescriptorData;
+					VkBufferView* updateData = (VkBufferView*)descriptorUpdateData;
 					writeSet.pTexelBufferView = updateData;
 					for (uint32_t arr = 0; arr < descInfo->mSize; ++arr)
 					{
@@ -5202,7 +5201,9 @@ void vk_updateDescriptorSet(
 	uint32_t                                     raytracingWriteCount = 0;
 #endif
 
-	uint8_t* descriptorUpdateData = pDescriptorSet->mVulkan.pDescriptorData;
+    const uint32_t descriptorMemSize = pRootSignature->mVulkan.mCumulativeDescriptorSizes[pDescriptorSet->mVulkan.mUpdateFrequency];
+	uint8_t* descriptorUpdateDataStart = (uint8_t*)alloca(descriptorMemSize);
+	uint8_t* descriptorUpdateData = descriptorUpdateDataStart;
 
 	for (uint32_t i = 0; i < count; ++i)
 	{
@@ -5235,7 +5236,7 @@ void vk_updateDescriptorSet(
 		{
 			vkUpdateDescriptorSets(pRenderer->mVulkan.pVkDevice, writeSetCount, writeSetArray, 0, NULL);
 			writeSetCount = 0;
-			descriptorUpdateData = pDescriptorSet->mVulkan.pDescriptorData;
+			descriptorUpdateData = descriptorUpdateDataStart;
 #ifdef VK_RAYTRACING_AVAILABLE
 			raytracingWriteCount = 0;
 #endif
