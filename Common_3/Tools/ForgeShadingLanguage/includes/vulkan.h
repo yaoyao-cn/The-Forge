@@ -276,7 +276,9 @@ vec4 _LoadLvlOffsetTex3D( texture2DArray TEX, sampler SMP, ivec3 P, int L, ivec3
 
 
 #define LoadTex2DMS(NAME, SMP, P, S) _LoadTex2DMS((NAME), (SMP), ivec2(P.xy), int(S))
-vec4 _LoadTex2DMS(texture2DMS TEX, sampler SMP, ivec2 P, int S) { return texelFetch(sampler2DMS(TEX, SMP), P, S); }
+ vec4 _LoadTex2DMS( texture2DMS TEX, sampler SMP, ivec2 P, int S) { return texelFetch( sampler2DMS(TEX, SMP), P, S); }
+uvec4 _LoadTex2DMS(utexture2DMS TEX, sampler SMP, ivec2 P, int S) { return texelFetch(usampler2DMS(TEX, SMP), P, S); }
+ivec4 _LoadTex2DMS(itexture2DMS TEX, sampler SMP, ivec2 P, int S) { return texelFetch(isampler2DMS(TEX, SMP), P, S); }
 #define LoadTex2DArrayMS(NAME, SMP, P, S) _LoadTex2DArrayMS((NAME), (SMP), ivec3(P.xyz), int(S))
 vec4 _LoadTex2DArrayMS(texture2DMSArray TEX, sampler SMP, ivec3 P, int S) { return texelFetch(sampler2DMSArray(TEX, SMP), P, S); }
 #ifdef GL_EXT_samplerless_texture_functions
