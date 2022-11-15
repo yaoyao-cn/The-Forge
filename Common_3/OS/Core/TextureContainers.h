@@ -1146,16 +1146,28 @@ static bool loadAutoTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, void
 
 	static stbi_io_callbacks io_callbacks = { FileStream_read, FileStream_skip, FileStream_eof };
 
+	bool isHDR = stbi_is_hdr_from_callbacks(&io_callbacks, pStream);
+
+	fsSeekStream(pStream, SBO_START_OF_FILE, 0);
 	int x = 0, y = 0, comp = 0;
 	if (!stbi_info_from_callbacks(&io_callbacks, pStream, &x, &y, &comp))
 	{
 		return false;
 	}
+
+	int channels = comp == 3 ? 4 : comp; //force 4 channels(gpu may not support reading of 3 channel image)
+
 	fsSeekStream(pStream, SBO_START_OF_FILE, 0);
-
-	int chennels = comp == 3 ? 4 : comp;
-
-	auto data = stbi_load_from_callbacks(&io_callbacks, pStream, &x, &y, nullptr, chennels); //force 4 chennels
+	stbi_uc* ldrData = nullptr;
+	float* hdrData = nullptr;
+	if (isHDR)
+	{
+		hdrData = stbi_loadf_from_callbacks(&io_callbacks, pStream, &x, &y, nullptr, channels);
+	}
+	else
+	{
+		ldrData = stbi_load_from_callbacks(&io_callbacks, pStream, &x, &y, nullptr, channels);
+	}
 
 	TextureDesc& textureDesc = *pOutDesc;
 	textureDesc.mWidth = x;
@@ -1166,31 +1178,31 @@ static bool loadAutoTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, void
 	textureDesc.mSampleCount = SAMPLE_COUNT_1;
 	textureDesc.mDescriptors = DESCRIPTOR_TYPE_TEXTURE;
 	textureDesc.mFormat = TinyImageFormat_UNDEFINED;
-	switch (chennels)
+	switch (channels)
 	{
 	case 1:
-		textureDesc.mFormat = TinyImageFormat_R8_UNORM;
+		textureDesc.mFormat = isHDR ? TinyImageFormat_R32_SFLOAT : TinyImageFormat_R8_UNORM;
 		break;
 	case 2:
-		textureDesc.mFormat = TinyImageFormat_R8G8_UNORM;
+		textureDesc.mFormat = isHDR ? TinyImageFormat_R32G32_SFLOAT : TinyImageFormat_R8G8_UNORM;
 		break;
 	case 3:
-		textureDesc.mFormat = TinyImageFormat_R8G8B8_UNORM;
+		textureDesc.mFormat = isHDR ? TinyImageFormat_R32G32B32_SFLOAT : TinyImageFormat_R8G8B8_UNORM;
 		break;
 	case 4:
-		textureDesc.mFormat = TinyImageFormat_R8G8B8A8_UNORM;
+		textureDesc.mFormat = isHDR ? TinyImageFormat_R32G32B32A32_SFLOAT : TinyImageFormat_R8G8B8A8_UNORM;
 		break;
 	default:
 		ASSERT(false);
 		break;
 	}
 
-	size_t   requiredSize = x * y * chennels;
+	size_t   requiredSize = x * y * channels * (isHDR ? sizeof(float) : sizeof(stbi_uc));
 	uint32_t rowPitch = 0;
 	uint32_t numBytes = 0;
 	if (!util_get_surface_info(x, y, textureDesc.mFormat, &numBytes, &rowPitch, NULL) || requiredSize != numBytes)
 	{
-		stbi_image_free(data);
+		stbi_image_free(isHDR ? (void*)hdrData : ldrData);
 		return false;
 	}
 
@@ -1200,7 +1212,7 @@ static bool loadAutoTextureDesc(FileStream* pStream, TextureDesc* pOutDesc, void
 	* #define STBI_REALLOC(p,newsz)     tf_realloc(p,newsz)
 	* #define STBI_FREE(p)              tf_free(p)
 	*/
-	*ppOutData = data;
+	*ppOutData = isHDR ? (void*)hdrData : ldrData;
 	*pOutDataSize = (uint32_t)requiredSize;
 
 	return true;
