@@ -96,8 +96,8 @@ inline f4x4 Identity()
     );
 }
 
-inline void setElem(inout f4x4 M, int i, int j, float val) { M[j][i] = val; }
-inline float getElem(f4x4 M, int i, int j) { return M[j][i]; }
+#define setElem(M, I, J, V) {M[J][I] = V;}
+#define getElem(M, I, J) (M[J][I])
 
 inline float4 getCol(in f4x4 M, const uint i) { return float4(M[0][i], M[1][i], M[2][i], M[3][i]); }
 inline float3 getCol(in f4x3 M, const uint i) { return float3(M[0][i], M[1][i], M[2][i]); }
