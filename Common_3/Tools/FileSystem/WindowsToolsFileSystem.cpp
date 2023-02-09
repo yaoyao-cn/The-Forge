@@ -136,7 +136,7 @@ void fswThreadFunc(void* data)
 
 			memset(utf8Name, 0, sizeof(utf8Name));
 			int outputLength = WideCharToMultiByte(
-				CP_UTF8, 0, fni->FileName, fni->FileNameLength / sizeof(WCHAR), utf8Name, sizeof(utf8Name) - 1, NULL, NULL);
+				CP_ACP, 0, fni->FileName, fni->FileNameLength / sizeof(WCHAR), utf8Name, sizeof(utf8Name) - 1, NULL, NULL);
 			if (outputLength == 0)
 			{
 				continue;
@@ -273,7 +273,7 @@ void fsGetFilesWithExtension(
 		do
 		{
 			char utf8Name[FS_MAX_PATH] = {};
-			WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, utf8Name, MAX_PATH, NULL, NULL);
+			WideCharToMultiByte(CP_ACP, 0, fd.cFileName, -1, utf8Name, MAX_PATH, NULL, NULL);
 
 			char result[FS_MAX_PATH] = {};
 			fsAppendPathComponent(subDirectory, utf8Name, result);
@@ -331,7 +331,7 @@ void fsGetSubDirectories(ResourceDirectory resourceDir, const char* subDirectory
                 if (!wcschr(fd.cFileName, '.'))
                 {
                     char utf8Name[FS_MAX_PATH] = {};
-                    WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, utf8Name, MAX_PATH, NULL, NULL);
+                    WideCharToMultiByte(CP_ACP, 0, fd.cFileName, -1, utf8Name, MAX_PATH, NULL, NULL);
                     char result[FS_MAX_PATH] = {};
                     fsAppendPathComponent(subDirectory, utf8Name, result);
 
