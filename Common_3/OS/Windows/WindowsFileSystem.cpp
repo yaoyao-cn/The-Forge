@@ -78,7 +78,7 @@ bool initFileSystem(FileSystemInitDesc* pDesc)
 	wchar_t utf16Path[FS_MAX_PATH];
 	GetModuleFileNameW(0, utf16Path, FS_MAX_PATH);
 	char applicationFilePath[FS_MAX_PATH] = {};
-	WideCharToMultiByte(CP_UTF8, 0, utf16Path, -1, applicationFilePath, MAX_PATH, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, utf16Path, -1, applicationFilePath, MAX_PATH, NULL, NULL);
 	fsGetParentPath(applicationFilePath, gApplicationPath);
 	gResourceMounts[RM_CONTENT] = gApplicationPath;
 	gResourceMounts[RM_DEBUG] = gApplicationPath;
@@ -86,7 +86,7 @@ bool initFileSystem(FileSystemInitDesc* pDesc)
 	// Get user directory
 	PWSTR userDocuments = NULL;
 	SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &userDocuments);
-	WideCharToMultiByte(CP_UTF8, 0, userDocuments, -1, gDocumentsPath, MAX_PATH, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, userDocuments, -1, gDocumentsPath, MAX_PATH, NULL, NULL);
 	CoTaskMemFree(userDocuments);
 	gResourceMounts[RM_DOCUMENTS] = gDocumentsPath;
 	gResourceMounts[RM_SAVE_0] = gApplicationPath;
@@ -103,8 +103,8 @@ bool initFileSystem(FileSystemInitDesc* pDesc)
 	//PWSTR localAppdata = NULL;
 	//SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &localAppdata);
 	//pathLength = wcslen(localAppdata);
-	//utf8Length = WideCharToMultiByte(CP_UTF8, 0, localAppdata, (int)pathLength, NULL, 0, NULL, NULL);
-	//WideCharToMultiByte(CP_UTF8, 0, localAppdata, (int)pathLength, appData, utf8Length, NULL, NULL);
+	//utf8Length = WideCharToMultiByte(CP_ACP, 0, localAppdata, (int)pathLength, NULL, 0, NULL, NULL);
+	//WideCharToMultiByte(CP_ACP, 0, localAppdata, (int)pathLength, appData, utf8Length, NULL, NULL);
 	//CoTaskMemFree(localAppdata);
 
 	gInitialized = true;
