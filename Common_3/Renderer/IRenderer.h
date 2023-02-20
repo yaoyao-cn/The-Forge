@@ -2781,7 +2781,8 @@ typedef struct GPUSettings
 	uint32_t            mUploadBufferTextureRowAlignment;
 	uint32_t            mMaxVertexInputBindings;
 	uint32_t            mMaxRootSignatureDWORDS;
-	uint32_t            mWaveLaneCount;
+    uint32_t            mWaveLaneCount;
+    uint8_t             mDeviceUUID[16];
 	WaveOpsSupportFlags mWaveOpsSupportFlags;
 	GPUVendorPreset     mGpuVendorPreset;
 	// Variable Rate Shading
