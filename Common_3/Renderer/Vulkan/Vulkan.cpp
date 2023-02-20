@@ -2024,12 +2024,13 @@ void util_query_gpu_settings(VkPhysicalDevice gpu, VkPhysicalDeviceProperties2* 
 	vkGetPhysicalDeviceFeatures2(gpu, gpuFeatures);
 #endif
 
-	// Get device properties
+    // Get device properties
+    VkPhysicalDeviceIDProperties idProperties = {};
+	idProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES;
 	VkPhysicalDeviceSubgroupProperties subgroupProperties = {};
 	subgroupProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
-	subgroupProperties.pNext = NULL;
+	subgroupProperties.pNext = &idProperties;
 	gpuProperties->sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR;
-	subgroupProperties.pNext = gpuProperties->pNext;
 	gpuProperties->pNext = &subgroupProperties;
 #if defined(NX64)
 	vkGetPhysicalDeviceProperties2(gpu, gpuProperties);
@@ -2043,6 +2044,7 @@ void util_query_gpu_settings(VkPhysicalDevice gpu, VkPhysicalDeviceProperties2* 
 	vkGetPhysicalDeviceQueueFamilyProperties(gpu, queueFamilyPropertyCount, *queueFamilyProperties);
 
 	*gpuSettings = {};
+	memcpy(gpuSettings->mDeviceUUID, idProperties.deviceUUID, VK_UUID_SIZE);
 	gpuSettings->mUniformBufferAlignment = (uint32_t)gpuProperties->properties.limits.minUniformBufferOffsetAlignment;
 	gpuSettings->mUploadBufferTextureAlignment = (uint32_t)gpuProperties->properties.limits.optimalBufferCopyOffsetAlignment;
 	gpuSettings->mUploadBufferTextureRowAlignment = (uint32_t)gpuProperties->properties.limits.optimalBufferCopyRowPitchAlignment;
