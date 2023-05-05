@@ -43,7 +43,7 @@ static inline T withUTF16Path(const char* path, T(*function)(const wchar_t*))
 	size_t len = strlen(path);
 	wchar_t* buffer = (wchar_t*)alloca((len + 1) * sizeof(wchar_t));
 
-	size_t resultLength = MultiByteToWideChar(CP_UTF8, 0, path, (int)len, buffer, (int)len);
+	size_t resultLength = MultiByteToWideChar(CP_ACP, 0, path, (int)len, buffer, (int)len);
 	buffer[resultLength] = 0;
 
 	return function(buffer);
@@ -179,7 +179,7 @@ bool PlatformOpenFile(ResourceDirectory resourceDir, const char* fileName, FileM
 	size_t filePathLen = strlen(filePath);
 	wchar_t* pathStr = (wchar_t*)alloca((filePathLen + 1) * sizeof(wchar_t));
 	size_t pathStrLength =
-		MultiByteToWideChar(CP_UTF8, 0, filePath, (int)filePathLen, pathStr, (int)filePathLen);
+		MultiByteToWideChar(CP_ACP, 0, filePath, (int)filePathLen, pathStr, (int)filePathLen);
 	pathStr[pathStrLength] = 0;
 
 	// Mode string utf-16 conversion
