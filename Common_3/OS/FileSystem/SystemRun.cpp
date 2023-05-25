@@ -53,6 +53,10 @@ int systemRun(const char* command, const char** arguments, size_t argumentCount,
 		size_t   pathLength = strlen(stdOutFile) + 1;
 		wchar_t* buffer = (wchar_t*)alloca(pathLength * sizeof(wchar_t));
 		MultiByteToWideChar(CP_UTF8, 0, stdOutFile, (int)pathLength, buffer, (int)pathLength);
+
+		// delete if file exists, otherwise the CreateFileW will failed with ERROR_ACCESS_DENIED
+		// DODO: find the reason why CreateFileW failed with ERROR_ACCESS_DENIED when the file exists
+		DeleteFileW(buffer);
 		stdOut = CreateFileW(buffer, GENERIC_ALL, FILE_SHARE_WRITE | FILE_SHARE_READ, &sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 
