@@ -2893,7 +2893,16 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 			// Request only one queue of each type if mRequestAllAvailableQueues is not set to true
 			if (queueCount > 1 && !pDesc->mVulkan.mRequestAllAvailableQueues)
 			{
-				queueCount = 1;
+				VkQueueFlags queueFlags = queueFamiliesProperties[i].queueFlags;
+				uint32_t validBitCount = 0;
+				if (queueFlags & VK_QUEUE_GRAPHICS_BIT)
+					validBitCount++;
+				if (queueFlags & VK_QUEUE_COMPUTE_BIT)
+					validBitCount++;
+				if (queueFlags & VK_QUEUE_TRANSFER_BIT)
+					validBitCount++;
+
+				queueCount = min(max(1u, validBitCount), queueCount);
 			}
 
 			ASSERT(queueCount <= kMaxQueueCount);
