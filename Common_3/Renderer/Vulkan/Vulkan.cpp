@@ -2016,7 +2016,24 @@ void util_query_gpu_settings(VkPhysicalDevice gpu, VkPhysicalDeviceProperties2* 
 	{
 		VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_INTERLOCK_FEATURES_EXT
 	};
-	gpuFeatures->pNext = &fragmentShaderInterlockFeatures;
+
+	uint32_t       count = 0;
+	vkEnumerateDeviceExtensionProperties(gpu, NULL, &count, NULL);
+	if (count > 0)
+	{
+		VkExtensionProperties* properties = (VkExtensionProperties*)tf_calloc(count, sizeof(*properties));
+		ASSERT(properties != NULL);
+		vkEnumerateDeviceExtensionProperties(gpu, NULL, &count, properties);
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			if (strcmp(properties[i].extensionName, VK_EXT_FRAGMENT_SHADER_INTERLOCK_EXTENSION_NAME) == 0)
+			{
+				gpuFeatures->pNext = &fragmentShaderInterlockFeatures;
+				break;
+			}
+		}
+		SAFE_FREE((void*)properties);
+	}
 #endif
 #ifndef NX64
 	vkGetPhysicalDeviceFeatures2KHR(gpu, gpuFeatures);
