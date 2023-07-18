@@ -4114,11 +4114,16 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
 	const bool linkedMultiGpu = (pRenderer->mGpuMode == GPU_MODE_LINKED && (pDesc->pSharedNodeIndices || pDesc->mNodeIndex));
 
 	VmaAllocationCreateInfo vma_mem_reqs = {};
-	vma_mem_reqs.usage = (VmaMemoryUsage)pDesc->mMemoryUsage;
+	vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO; // (VmaMemoryUsage)pDesc->mMemoryUsage;
+	if(pDesc->mMemoryUsage == RESOURCE_MEMORY_USAGE_CPU_TO_GPU)
+		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+	if(pDesc->mMemoryUsage == RESOURCE_MEMORY_USAGE_GPU_TO_CPU)
+		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_OWN_MEMORY_BIT)
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT)
-		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
+		vma_mem_reqs.flags |= (VMA_ALLOCATION_CREATE_MAPPED_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT);
 	if (linkedMultiGpu)
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_DONT_BIND_BIT;
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_HOST_VISIBLE)
