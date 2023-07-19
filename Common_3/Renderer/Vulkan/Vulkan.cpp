@@ -4117,6 +4117,9 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
 	vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO; // (VmaMemoryUsage)pDesc->mMemoryUsage;
 	if(pDesc->mMemoryUsage == RESOURCE_MEMORY_USAGE_CPU_TO_GPU)
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+	if(pDesc->mMemoryUsage == RESOURCE_MEMORY_USAGE_GPU_TO_CPU)
+		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_OWN_MEMORY_BIT)
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT)
