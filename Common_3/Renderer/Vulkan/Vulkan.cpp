@@ -2919,8 +2919,11 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 				if (queueFlags & VK_QUEUE_TRANSFER_BIT)
 					validBitCount++;
 
-				queueCount = min(max(1u, validBitCount), queueCount);
+				queueCount = validBitCount > 0 ? 1 : 0;
 			}
+            
+            if(queueCount == 0)
+                continue;
 
 			ASSERT(queueCount <= kMaxQueueCount);
 			queueCount = min(queueCount, kMaxQueueCount);
