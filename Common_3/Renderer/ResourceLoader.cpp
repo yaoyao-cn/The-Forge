@@ -884,13 +884,15 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 		if (nullptr != pTextureDesc->pData)
 		{
 			ASSERT(pTextureDesc->mSize > 0);
+			ASSERT((nullptr != pTextureDesc->pDesc && TEXTURE_CONTAINER_NONE == pTextureDesc->mContainer) ||
+				(nullptr == pTextureDesc->pDesc && TEXTURE_CONTAINER_NONE != pTextureDesc->mContainer));
 			fsOpenStreamFromMemory(pTextureDesc->pData, pTextureDesc->mSize, FM_READ_BINARY, false, &stream);
 			success = true;
 		}
 
 		TextureUpdateDescInternal updateDesc = {};
 		TextureContainerType      container = pTextureDesc->mContainer;
-		static const char*        extensions[] = { NULL, "dds", "ktx", "gnf", "basis", "svt" };
+		static const char*        extensions[] = { NULL, "dds", "ktx", "gnf", "basis", "svt" , "" };
 
 		if (TEXTURE_CONTAINER_DEFAULT == container)
 		{
@@ -904,6 +906,10 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 		}
 
 		TextureDesc textureDesc = {};
+		if (nullptr != pTextureDesc->pDesc)
+		{
+			textureDesc = *pTextureDesc->pDesc;
+		}
 		textureDesc.pName = pTextureDesc->pFileName;
 		textureDesc.mFlags |= pTextureDesc->mCreationFlag;
 
@@ -918,6 +924,11 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 
 		switch (container)
 		{
+			case TEXTURE_CONTAINER_NONE:
+			{
+				// No container, nothing to do, just load the texture
+				break;
+			}
 			case TEXTURE_CONTAINER_DDS:
 			{
 #if defined(XBOX)
@@ -1038,6 +1049,12 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 			updateDesc.mMipLevels = textureDesc.mMipLevels;
 			updateDesc.mBaseArrayLayer = 0;
 			updateDesc.mLayerCount = textureDesc.mArraySize;
+
+			if (nullptr != pTextureDesc->pDesc)
+			{
+				// pDesc is tf_malloc'd in addResource(TextureLoadDesc* ...), so we need to free it here
+				tf_free(pTextureDesc->pDesc);
+			}
 
 			return updateTexture(pRenderer, pCopyEngine, activeSet, updateDesc);
 		}
@@ -2381,6 +2398,12 @@ void addResource(TextureLoadDesc* pTextureDesc, SyncToken* token)
 	else
 	{
 		TextureLoadDesc updateDesc = *pTextureDesc;
+		if (nullptr != pTextureDesc->pDesc)
+		{
+			// pDesc is freed in loadTexture
+			updateDesc.pDesc = (TextureDesc*)tf_calloc(1, sizeof(TextureDesc));
+			*updateDesc.pDesc = *pTextureDesc->pDesc;
+		}
 		queueTextureLoad(pResourceLoader, &updateDesc, token);
 		if (pResourceLoader->mDesc.mSingleThreaded)
 		{
