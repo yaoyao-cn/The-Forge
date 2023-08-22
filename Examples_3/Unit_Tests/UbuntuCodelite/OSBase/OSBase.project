@@ -310,7 +310,7 @@ shaders:&#xD;
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Static Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="prepend" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-std=c++14;$(shell pkg-config --cflags gtk+-3.0);-Wall;-Wno-comment;-fPIC;" C_Options="-g;-Wall;-Wno-comment;-fPIC;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-O3;-std=c++14;$(shell pkg-config --cflags gtk+-3.0);-Wall;-Wno-comment;-fPIC;" C_Options="-g;-O3;-Wall;-Wno-comment;-fPIC;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="" Required="yes"/>
