@@ -405,6 +405,9 @@
     <ClCompile Include="..\..\..\..\..\Common_3\OS\Android\AndroidWindow.cpp">
       <Filter>OS\Android</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\basis_universal\zstd\zstddeclib.c">
+      <Filter>Dependencies\basisu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\Common_3\OS\Core\Atomics.h">

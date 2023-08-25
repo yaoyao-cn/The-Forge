@@ -39,6 +39,7 @@
     <ClCompile Include="..\..\..\..\..\Common_3\OS\UI\UI.cpp" />
     <ClCompile Include="..\..\..\..\..\Common_3\OS\WindowSystem\WindowSystem.cpp" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\basis_universal\transcoder\basisu_transcoder.cpp" />
+    <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\basis_universal\zstd\zstddeclib.c" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\cpu_features\src\hwcaps.c" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\cpu_features\src\impl_aarch64_linux_or_android.c" />
     <ClCompile Include="..\..\..\..\..\Common_3\ThirdParty\OpenSource\cpu_features\src\impl_x86_linux_or_android.c" />

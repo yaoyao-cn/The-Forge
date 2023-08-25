@@ -17,8 +17,7 @@
     <CharacterSet>Unicode</CharacterSet>
     <CppLanguageStandard>cpp14</CppLanguageStandard>
     <CLanguageStandard>c99</CLanguageStandard>
-    <AndroidApkName>$(RootNamespace).apk</AndroidApkName>
-    <AndroidApplicationVariant>Debug</AndroidApplicationVariant>
+    <AndroidApkName>$(RootNamespace)-$(Configuration).apk</AndroidApkName>
     <AndroidEnablePackaging>true</AndroidEnablePackaging>
     <AndroidApplicationModule>app</AndroidApplicationModule>
     <AndroidGradleBuildOutputDir>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName)\$(PlatformTarget)\AndroidBuild</AndroidGradleBuildOutputDir>
