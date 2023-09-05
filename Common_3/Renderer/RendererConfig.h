@@ -46,7 +46,7 @@
 #include "Metal/MetalConfig.h"
 #elif defined(__ANDROID__)
 #ifndef QUEST_VR
-#include "OpenGLES/GLESConfig.h"
+//#include "OpenGLES/GLESConfig.h"
 #endif
 #ifdef ARCH_ARM64
 #include "Vulkan/VulkanConfig.h"
