@@ -793,6 +793,6 @@ def metal(fsl, dst):
                 # print('modify call:', shader_src[i], line)
                 shader_src[i] = line
 
-    open(dst, 'w').writelines(shader_src)
+    open(dst, 'w', encoding='utf-8').writelines(shader_src)
     # sys.exit(0)
     return 0

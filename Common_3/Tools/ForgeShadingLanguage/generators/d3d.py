@@ -337,7 +337,7 @@ def d3d(fsl, dst, pssl=False, prospero=False, xbox=False, rootSignature=None, d3
             last_res_decl = explicit_res_decl
         if last_res_decl > 0: # skip srt altogether if no declared resourced or not requested
             srt = pssl.gen_srt(srt_resources, srt_free_resources, srt_references)
-            open(dst + '.srt.h', 'w').write(srt)
+            open(dst + '.srt.h', 'w', encoding='utf-8').write(srt)
             shader_src.insert(last_res_decl, '\n#include \"' + os.path.basename(dst) + '.srt.h\"\n')
 
     # insert root signature at the end (not sure whether that will work for xbox)
@@ -346,6 +346,6 @@ def d3d(fsl, dst, pssl=False, prospero=False, xbox=False, rootSignature=None, d3
     if rootSignature and xbox:
         shader_src += rootSignature + ['\n']# + shader.lines
 
-    open(dst, 'w').writelines(shader_src)
+    open(dst, 'w', encoding='utf-8').writelines(shader_src)
 
     return 0

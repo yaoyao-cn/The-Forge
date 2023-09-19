@@ -679,5 +679,5 @@ def gles(fsl, dst):
 
         shader_src += [re.sub('\d\.?f', replacef, updatedline)]
 
-    open(dst, 'w').writelines(shader_src)
+    open(dst, 'w', encoding='utf-8').writelines(shader_src)
     return 0
