@@ -281,8 +281,12 @@ uvec4 _LoadTex2DMS(utexture2DMS TEX, sampler SMP, ivec2 P, int S) { return texel
 ivec4 _LoadTex2DMS(itexture2DMS TEX, sampler SMP, ivec2 P, int S) { return texelFetch(isampler2DMS(TEX, SMP), P, S); }
 #define LoadTex2DArrayMS(NAME, SMP, P, S) _LoadTex2DArrayMS((NAME), (SMP), ivec3(P.xyz), int(S))
 vec4 _LoadTex2DArrayMS(texture2DMSArray TEX, sampler SMP, ivec3 P, int S) { return texelFetch(sampler2DMSArray(TEX, SMP), P, S); }
+uvec4 _LoadTex2DArrayMS(utexture2DMSArray TEX, sampler SMP, ivec3 P, int S) { return texelFetch(usampler2DMSArray(TEX, SMP), P, S); }
+ivec4 _LoadTex2DArrayMS(itexture2DMSArray TEX, sampler SMP, ivec3 P, int S) { return texelFetch(isampler2DMSArray(TEX, SMP), P, S); }
 #ifdef GL_EXT_samplerless_texture_functions
 vec4 _LoadTex2DArrayMS(texture2DMSArray TEX, uint _NO_SAMPLER, ivec3 P, int S) { return texelFetch(TEX, P, S); }
+uvec4 _LoadTex2DArrayMS(utexture2DMSArray TEX, uint _NO_SAMPLER, ivec3 P, int S) { return texelFetch(TEX, P, S); }
+ivec4 _LoadTex2DArrayMS(itexture2DMSArray TEX, uint _NO_SAMPLER, ivec3 P, int S) { return texelFetch(TEX, P, S); }
 #endif
 
 #define SampleGradTex2D(TEX, SMP, P, DX, DY) _SampleGradTex2D((TEX), (SMP), vec2((P).xy), vec2((DX).xy), vec2((DY).xy))
