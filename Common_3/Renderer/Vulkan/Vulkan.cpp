@@ -727,8 +727,7 @@ static void add_render_pass(Renderer* pRenderer, const RenderPassDesc* pDesc, Re
 	create_info.dependencyCount = 0;
 	create_info.pDependencies = NULL;
 
-#if defined(QUEST_VR)
-    const uint viewMask = 0b11;
+	const uint viewMask = 0b11;
     DECLARE_ZERO(VkRenderPassMultiviewCreateInfo, multiview_create_info);
 
     if (pDesc->mVRMultiview)
@@ -743,7 +742,6 @@ static void add_render_pass(Renderer* pRenderer, const RenderPassDesc* pDesc, Re
 
         create_info.pNext = &multiview_create_info;
     }
-#endif
 
 	CHECK_VKRESULT(vkCreateRenderPass(pRenderer->mVulkan.pVkDevice, &create_info, &gVkAllocationCallbacks, &(pRenderPass->pRenderPass)));
 
@@ -2793,12 +2791,10 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 							fragmentShaderInterlockExtension = true;
 						}
 #endif
-#if defined(QUEST_VR)
 						if (strcmp(wantedDeviceExtensions[k], VK_KHR_MULTIVIEW_EXTENSION_NAME) == 0)
 						{
 							pRenderer->mVulkan.mMultiviewExtension = true;
 						}
-#endif
 #ifdef ENABLE_NSIGHT_AFTERMATH
 						if (strcmp(wantedDeviceExtensions[k], VK_NV_DEVICE_DIAGNOSTIC_CHECKPOINTS_EXTENSION_NAME) == 0)
 						{
@@ -2842,10 +2838,10 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 	VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcrFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES };
 	ADD_TO_NEXT_CHAIN(pRenderer->mVulkan.mYCbCrExtension, ycbcrFeatures);
 #endif
-#if defined(QUEST_VR)
+
 	VkPhysicalDeviceMultiviewFeatures multiviewFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES };
+	multiviewFeatures.multiview = VK_TRUE;
 	ADD_TO_NEXT_CHAIN(pRenderer->mVulkan.mMultiviewExtension, multiviewFeatures);
-#endif
 
 
 #if VK_KHR_buffer_device_address
@@ -4713,13 +4709,11 @@ void vk_addRenderTarget(Renderer* pRenderer, const RenderTargetDesc* pDesc, Rend
 	((RenderTargetDesc*)pDesc)->mMipLevels = max(1U, pDesc->mMipLevels);
 
     uint arraySize = pDesc->mArraySize;
-#if defined(QUEST_VR)
-    if (pDesc->mFlags & TEXTURE_CREATION_FLAG_VR_MULTIVIEW)
+    if ((pDesc->mFlags & TEXTURE_CREATION_FLAG_VR_MULTIVIEW) && pRenderer->mVulkan.mMultiviewExtension)
     {
         ASSERT(arraySize == 1 && pDesc->mDepth == 1);
         arraySize = 2; // TODO: Support non multiview rendering
     }
-#endif
 
 	uint32_t depthOrArraySize = arraySize * pDesc->mDepth;
 	uint32_t numRTVs = pDesc->mMipLevels;
@@ -4853,7 +4847,7 @@ void vk_addRenderTarget(Renderer* pRenderer, const RenderTargetDesc* pDesc, Rend
 	pRenderTarget->mSampleQuality = pDesc->mSampleQuality;
 	pRenderTarget->mFormat = pDesc->mFormat;
 	pRenderTarget->mClearValue = pDesc->mClearValue;
-    pRenderTarget->mVRMultiview = (pDesc->mFlags & TEXTURE_CREATION_FLAG_VR_MULTIVIEW) != 0;
+	pRenderTarget->mVRMultiview = ((pDesc->mFlags & TEXTURE_CREATION_FLAG_VR_MULTIVIEW) != 0) && pRenderer->mVulkan.mMultiviewExtension;
     pRenderTarget->mVRFoveatedRendering = (pDesc->mFlags & TEXTURE_CREATION_FLAG_VR_FOVEATED_RENDERING) != 0;
 
 	// Unlike DX12, Vulkan textures start in undefined layout.
@@ -6402,7 +6396,7 @@ static void addGraphicsPipeline(Renderer* pRenderer, const PipelineDesc* pMainDe
 	renderPassDesc.pColorFormats = pDesc->pColorFormats;
 	renderPassDesc.mSampleCount = pDesc->mSampleCount;
 	renderPassDesc.mDepthStencilFormat = pDesc->mDepthStencilFormat;
-    renderPassDesc.mVRMultiview = pDesc->pShaderProgram->mIsMultiviewVR;
+    renderPassDesc.mVRMultiview = pDesc->pShaderProgram->mIsMultiviewVR && pRenderer->mVulkan.mMultiviewExtension;
     renderPassDesc.mVRFoveatedRendering = pDesc->mVRFoveatedRendering;
 	renderPassDesc.pLoadActionsColor = gDefaultLoadActions;
 	renderPassDesc.mLoadActionDepth = gDefaultLoadActions[0];

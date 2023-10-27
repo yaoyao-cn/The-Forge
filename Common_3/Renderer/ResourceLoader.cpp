@@ -3424,6 +3424,14 @@ void addShader(Renderer* pRenderer, const ShaderLoadDesc* pDesc, Shader** ppShad
 	}
 #endif
 
+	bool multiViewAPIEnabled = false;
+#if defined(VULKAN)
+	if (gSelectedRendererApi == RENDERER_API_VULKAN)
+	{
+		multiViewAPIEnabled = pRenderer->mVulkan.mMultiviewExtension;
+	}
+#endif
+
 #ifndef TARGET_IOS
 	BinaryShaderDesc binaryDesc = {};
 #if defined(METAL)
@@ -3459,20 +3467,18 @@ void addShader(Renderer* pRenderer, const ShaderLoadDesc* pDesc, Shader** ppShad
 			{
                 combinedFlags |= pDesc->mStages[i].mFlags;
 				uint32_t macroCount = pDesc->mStages[i].mMacroCount + pRenderer->mBuiltinShaderDefinesCount;
-#if defined(QUEST_VR)
-                if (pDesc->mStages[i].mFlags & SHADER_STAGE_LOAD_FLAG_ENABLE_VR_MULTIVIEW)
+
+                if (multiViewAPIEnabled && (pDesc->mStages[i].mFlags & SHADER_STAGE_LOAD_FLAG_ENABLE_VR_MULTIVIEW))
                     ++macroCount;
-#endif
 
 				eastl::vector<ShaderMacro> macros(macroCount);
 				for (uint32_t macro = 0; macro < pRenderer->mBuiltinShaderDefinesCount; ++macro)
 					macros[macro] = pRenderer->pBuiltinShaderDefines[macro];
 				for (uint32_t macro = 0; macro < pDesc->mStages[i].mMacroCount; ++macro)
 					macros[pRenderer->mBuiltinShaderDefinesCount + macro] = pDesc->mStages[i].pMacros[macro];
-#if defined(QUEST_VR)
-                if (pDesc->mStages[i].mFlags & SHADER_STAGE_LOAD_FLAG_ENABLE_VR_MULTIVIEW)
+
+                if (multiViewAPIEnabled && (pDesc->mStages[i].mFlags & SHADER_STAGE_LOAD_FLAG_ENABLE_VR_MULTIVIEW))
                     macros[pRenderer->mBuiltinShaderDefinesCount + pDesc->mStages[i].mMacroCount] = {"VR_MULTIVIEW_ENABLED", "1"};
-#endif
 
 				if (!load_shader_stage_byte_code(
 						pRenderer, pDesc->mTarget, stage, stages, pDesc->mStages[i], macroCount, macros.data(), pStage))
@@ -3516,12 +3522,10 @@ void addShader(Renderer* pRenderer, const ShaderLoadDesc* pDesc, Shader** ppShad
 
 	addShaderBinary(pRenderer, &binaryDesc, ppShader);
 
-#if defined(QUEST_VR)
     if (ppShader)
     {
-        (*ppShader)->mIsMultiviewVR = (combinedFlags & SHADER_STAGE_LOAD_FLAG_ENABLE_VR_MULTIVIEW) != 0;
+        (*ppShader)->mIsMultiviewVR = multiViewAPIEnabled && ((combinedFlags & SHADER_STAGE_LOAD_FLAG_ENABLE_VR_MULTIVIEW) != 0);
     }
-#endif
 
 #if defined(METAL)
 	for (uint32_t i = 0; i < SHADER_STAGE_COUNT; ++i)

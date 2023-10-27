@@ -2882,9 +2882,8 @@ typedef struct DEFINE_ALIGNED(Renderer, 64)
 			uint32_t               mExternalMemoryExtension : 1;
 			uint32_t               mDebugMarkerSupport : 1;
 			uint32_t               mOwnInstance : 1;
-#if defined(QUEST_VR)
 			uint32_t               mMultiviewExtension : 1;
-#endif
+
 			union
 			{
 				struct

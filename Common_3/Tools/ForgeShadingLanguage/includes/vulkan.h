@@ -9,7 +9,8 @@
 #endif
 
 #if VR_MULTIVIEW_ENABLED && defined(STAGE_VERT)
-    #extension GL_OVR_multiview2 : require
+    //#extension GL_OVR_multiview2 : require
+    #extension GL_EXT_multiview : require
 #endif
 
 #define f4(X) vec4(X)
@@ -785,7 +786,8 @@ bool any(vec3 x) { return any(notEqual(x, vec3(0))); }
     #ifndef STAGE_VERT
         #define VR_VIEW_ID(VID) VID
     #else
-        #define VR_VIEW_ID (gl_ViewID_OVR)
+        //#define VR_VIEW_ID (gl_ViewID_OVR)
+        #define VR_VIEW_ID (gl_ViewIndex)
     #endif
     #define VR_MULTIVIEW_COUNT 2
 #else
