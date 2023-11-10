@@ -7529,7 +7529,7 @@ void vk_acquireNextImage(Renderer* pRenderer, SwapChain* pSwapChain, Semaphore* 
 			pImageIndex);
 
 		// If swapchain is out of date, let caller know by setting image index to -1
-		if (vk_res == VK_ERROR_OUT_OF_DATE_KHR)
+		if (vk_res == VK_ERROR_OUT_OF_DATE_KHR || vk_res == VK_ERROR_SURFACE_LOST_KHR)
 		{
 			*pImageIndex = -1;
 			vkResetFences(pRenderer->mVulkan.pVkDevice, 1, &pFence->mVulkan.pVkFence);
@@ -7546,7 +7546,7 @@ void vk_acquireNextImage(Renderer* pRenderer, SwapChain* pSwapChain, Semaphore* 
 			VK_NULL_HANDLE, pImageIndex);    //-V522
 
 		// If swapchain is out of date, let caller know by setting image index to -1
-		if (vk_res == VK_ERROR_OUT_OF_DATE_KHR)
+		if (vk_res == VK_ERROR_OUT_OF_DATE_KHR || vk_res == VK_ERROR_SURFACE_LOST_KHR)
 		{
 			*pImageIndex = -1;
 			pSignalSemaphore->mVulkan.mSignaled = false;
