@@ -322,7 +322,7 @@ inline void AtomicMin( device uint& DST, uint VAL)
 
 template <typename T, metal::access A>
 vec<T, 4> _LoadTex3D(texture2d_array<T, A> tex, uint3 p, uint lod)
-{ return tex.read(p, lod); }
+{ return tex.read(uint2(p.xy), p.z, lod); }
 
 template <typename T, metal::access A>
 vec<T, 4> _LoadTex3D(texture3d<T, A> tex, uint3 p, uint lod)
