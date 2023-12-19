@@ -6866,9 +6866,10 @@ void vk_cmdBindRenderTargets(
 			(uint32_t)ppRenderTargets[i]->mFormat,
 			(uint32_t)ppRenderTargets[i]->mSampleCount,
 			pLoadActions ? (uint32_t)pLoadActions->mLoadActionsColor[i] : gDefaultLoadActions[i],
-			(uint32_t)colorStoreAction[i]
+			(uint32_t)colorStoreAction[i],
+			(uint32_t)ppRenderTargets[i]->mVRMultiview,
 		};
-		renderPassHash = tf_mem_hash<uint32_t>(hashValues, 4, renderPassHash);
+		renderPassHash = tf_mem_hash<uint32_t>(hashValues, 5, renderPassHash);
 		frameBufferHash = tf_mem_hash<uint32_t>(&ppRenderTargets[i]->mVulkan.mId, 1, frameBufferHash);
 		vrFoveatedRendering |= ppRenderTargets[i]->mVRFoveatedRendering;
 	}
@@ -6887,8 +6888,9 @@ void vk_cmdBindRenderTargets(
 			pLoadActions ? (uint32_t)pLoadActions->mLoadActionStencil : gDefaultLoadActions[0],
 			(uint32_t)depthStoreAction,
 			(uint32_t)stencilStoreAction,
+			(uint32_t)pDepthStencil->mVRMultiview,
 		};
-		renderPassHash = tf_mem_hash<uint32_t>(hashValues, 6, renderPassHash);
+		renderPassHash = tf_mem_hash<uint32_t>(hashValues, 7, renderPassHash);
 		frameBufferHash = tf_mem_hash<uint32_t>(&pDepthStencil->mVulkan.mId, 1, frameBufferHash);
 		vrFoveatedRendering |= pDepthStencil->mVRFoveatedRendering;
 	}
