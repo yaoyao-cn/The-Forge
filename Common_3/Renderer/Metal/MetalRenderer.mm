@@ -5148,6 +5148,7 @@ MTLVertexFormat util_to_mtl_vertex_format(const TinyImageFormat format)
 		case TinyImageFormat_R8G8_UNORM: return MTLVertexFormatUChar2Normalized;
 		case TinyImageFormat_R8G8B8_UNORM: return MTLVertexFormatUChar3Normalized;
 		case TinyImageFormat_R8G8B8A8_UNORM: return MTLVertexFormatUChar4Normalized;
+		case TinyImageFormat_B8G8R8A8_UNORM: return MTLVertexFormatUChar4Normalized_BGRA;
 
 		case TinyImageFormat_R8G8_SNORM: return MTLVertexFormatChar2Normalized;
 		case TinyImageFormat_R8G8B8_SNORM: return MTLVertexFormatChar3Normalized;
