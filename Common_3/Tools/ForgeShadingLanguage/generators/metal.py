@@ -201,6 +201,7 @@ def metal(fsl, dst):
     texture_location = 0
     sampler_location = 0
     attribute_index  = 0
+    texture_location_dict = {}
 
     # reversed list of functions, used to determine where a resource is being accessed
     reversed_fns = list(reversed(list(global_fn_table.items())))
@@ -538,8 +539,12 @@ def metal(fsl, dst):
                     binding = ' [[sampler({})]]'.format(sampler_location)
                     sampler_location += 1
                 elif 'Tex' in resType or 'Depth' in getMacroName(resType):
-                    binding = ' [[texture({})]]'.format(texture_location)
-                    texture_location += 1
+                    # find texture location in texture_location_dict with key freq+dxreg
+                    key = freq+dxreg
+                    if key not in texture_location_dict:
+                        texture_location_dict[key] = texture_location
+                        texture_location += 1
+                    binding = ' [[texture({})]]'.format(texture_location_dict[key])
                 elif 'Buffer' in resType:
                     binding = ' [[buffer({})]]'.format(buffer_location)
                     buffer_location += 1
