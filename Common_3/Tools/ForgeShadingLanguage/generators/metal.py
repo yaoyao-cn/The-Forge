@@ -38,6 +38,7 @@ def metal(fsl, dst):
 
     shader_src = getHeader(fsl)
     shader_src += ['#define METAL\n']
+    shader_src += ['#define STAGE_', shader.stage.name, '\n']
 
     if shader.enable_waveops:
         shader_src += ['#define ENABLE_WAVEOPS()\n']
