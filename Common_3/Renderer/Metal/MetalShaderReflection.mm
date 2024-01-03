@@ -468,8 +468,14 @@ void mtl_createShaderReflection(
 #endif
 		for (uint i = 0; i < maxColorAttachments; i++)
 		{
-			renderPipelineDesc.colorAttachments[i].pixelFormat = MTLPixelFormatR8Unorm;
+			// there is no way to get the pixel format from the shader
+			// and R8Unorm is not compatible with R8Uint
+			// see: https://stackoverflow.com/questions/40234270/how-to-get-the-amount-of-color-attachments-using-shader-reflection-in-metal
+			// TODO: find a way to get the pixel format from the shader
+			//renderPipelineDesc.colorAttachments[i].pixelFormat = MTLPixelFormatR8Unorm;
 		}
+		// also there is no way to get the depth pixel format from the shader
+		// we just assume it is MTLPixelFormatDepth32Float
 		renderPipelineDesc.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
 
 		// We need to create a vertex descriptor if needed to obtain reflection information
