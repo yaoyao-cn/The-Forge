@@ -1136,6 +1136,7 @@ typedef struct DEFINE_ALIGNED(Texture, 64)
 			struct VmaAllocation_T* pAllocation;
 			/// Native handle of the underlying resource
 			id<MTLTexture> mtlTexture;
+			id<MTLTexture> mtlStencilTexture;
 			id<MTLTexture> __strong* pMtlUAVDescriptors;
 			id                       mpsTextureAllocator;
 			uint32_t                 mtlPixelFormat;
@@ -1188,8 +1189,8 @@ typedef struct DEFINE_ALIGNED(Texture, 64)
 	// Only applies to Vulkan but kept here as adding it inside mVulkan block increases the size of the struct and triggers assert below
 	uint32_t mLazilyAllocated : 1;
 } Texture;
-// One cache line
-COMPILE_ASSERT(sizeof(Texture) == 8 * sizeof(uint64_t));
+// 2 cache lines
+COMPILE_ASSERT(sizeof(Texture) <= 16 * sizeof(uint64_t));
 
 typedef struct RenderTargetDesc
 {

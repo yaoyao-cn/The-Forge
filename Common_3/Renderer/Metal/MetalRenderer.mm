@@ -736,6 +736,11 @@ void mtl_updateDescriptorSet(
 											setTexture:pParam->ppTextures[j]->pMtlUAVDescriptors[pParam->mUAVMipSlice]
 											   atIndex:pDesc->mHandleIndex + j];
 									}
+									else if(type == DESCRIPTOR_TYPE_TEXTURE && pParam->mBindStencilResource && pParam->ppTextures[j]->mtlStencilTexture)
+									{
+										[pDescriptorSet->mArgumentEncoder setTexture:pParam->ppTextures[j]->mtlStencilTexture
+																			 atIndex:pDesc->mHandleIndex + arrayStart + j];
+									}
 									else
 									{
 										[pDescriptorSet->mArgumentEncoder setTexture:pParam->ppTextures[j]->mtlTexture
@@ -756,6 +761,10 @@ void mtl_updateDescriptorSet(
 						if (type == DESCRIPTOR_TYPE_RW_TEXTURE && pParam->ppTextures[0]->pMtlUAVDescriptors)
 						{
 							pData->pResource = pParam->ppTextures[0]->pMtlUAVDescriptors[pParam->mUAVMipSlice];
+						}
+					    else if(type == DESCRIPTOR_TYPE_TEXTURE && pParam->mBindStencilResource && pParam->ppTextures[0]->mtlStencilTexture)
+						{
+							pData->pResource = pParam->ppTextures[0]->mtlStencilTexture;
 						}
 						else
 						{
@@ -2559,6 +2568,8 @@ void mtl_removeTexture(Renderer* pRenderer, Texture* pTexture)
 #endif
 
 	pTexture->mtlTexture = nil;
+
+	pTexture->mtlStencilTexture = nil;
 
 	// Destroy descriptors
 	if (pTexture->pMtlUAVDescriptors)
@@ -5399,6 +5410,7 @@ void add_texture(Renderer* pRenderer, const TextureDesc* pDesc, Texture** ppText
 		((TextureDesc*)pDesc)->mMipLevels = 1;
 
 	bool isDepthBuffer = TinyImageFormat_HasDepth(pDesc->mFormat) || TinyImageFormat_HasStencil(pDesc->mFormat);
+	bool isStencilBuffer = TinyImageFormat_HasStencil(pDesc->mFormat);
 
 	pTexture->mtlPixelFormat = (uint32_t)TinyImageFormat_ToMTLPixelFormat(pDesc->mFormat);
 
@@ -5556,6 +5568,10 @@ void add_texture(Renderer* pRenderer, const TextureDesc* pDesc, Texture** ppText
 		if ((pDesc->mDescriptors & DESCRIPTOR_TYPE_TEXTURE) != 0)
 		{
 			textureDesc.usage |= MTLTextureUsageShaderRead;
+			if(isStencilBuffer)
+			{
+				textureDesc.usage |= MTLTextureUsagePixelFormatView;
+			}
 		}
 
 		if (isRT || isDepthBuffer)
@@ -5635,6 +5651,25 @@ void add_texture(Renderer* pRenderer, const TextureDesc* pDesc, Texture** ppText
 			}
 
 			ASSERT(pTexture->mtlTexture);
+		}
+	}
+
+	if(isStencilBuffer)
+	{
+		switch (pTexture->mtlPixelFormat)
+		{
+			case MTLPixelFormatDepth32Float_Stencil8:
+				pTexture->mtlStencilTexture = [pTexture->mtlTexture newTextureViewWithPixelFormat:MTLPixelFormatX32_Stencil8];
+				break;
+#if !defined(TARGET_IOS)
+			// On iOS, Metal does not support 24-bit depth buffers with 8-bit stencil
+			case MTLPixelFormatDepth24Unorm_Stencil8:
+				pTexture->mtlStencilTexture = [pTexture->mtlTexture newTextureViewWithPixelFormat:MTLPixelFormatX24_Stencil8];
+				break;
+#endif
+			default:
+				ASSERT(false);
+				break;
 		}
 	}
 
