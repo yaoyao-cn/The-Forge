@@ -558,16 +558,23 @@ def metal(fsl, dst):
 
                 global_reference_paths[baseName] = baseName
 
+                reference_arg = '\n#ifdef ' + macro + '\n'
                 if not isArray(resName):
-                    global_reference_args[baseName] = 'thread ' + resType + '& ' + resName
+                    reference_arg += 'thread ' + resType + '& ' + resName
                     if 'Buffer' in resType:
                         space = 'constant'
                         if 'RW' in resType:
                             space = 'device'
-                        global_reference_args[baseName] = space + ' ' + resType + '* ' + resName
+                        reference_arg += space + ' ' + resType + '* ' + resName
                 else:
                     array = resName[resName.find('['):]
-                    global_reference_args[baseName] = 'thread ' + resType + '(&' + baseName+') ' + array
+                    reference_arg += 'thread ' + resType + '(&' + baseName+') ' + array
+                
+                reference_arg += '\n#endif\n'
+                if baseName in global_reference_args:
+                    global_reference_args[baseName] += reference_arg
+                else:
+                    global_reference_args[baseName] = reference_arg
 
                 shader_src += ['#define _Get_', baseName, ' ', baseName, '\n']
 
