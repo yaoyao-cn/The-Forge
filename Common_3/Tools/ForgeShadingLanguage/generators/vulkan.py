@@ -395,6 +395,10 @@ def vulkan(fsl, dst):
                     input_value = elem_dtype+'(float4(gl_FragCoord.xyz, 1.0f / gl_FragCoord.w))'
                     reference = []
 
+                if sem == 'SV_COVERAGE' and shader.stage == Stages.FRAG:
+                    input_value = 'gl_SampleMaskIn[0]'
+                    reference = []
+
                 var_postfix = ''
                 if shader.stage == Stages.TESC:
                     if sem == 'SV_POSITION':
@@ -434,7 +438,7 @@ def vulkan(fsl, dst):
                 if shader.stage == Stages.VERT and sem != 'SV_VERTEXID':
                     assignment += [';\n\t', sem]
 
-                if sem != 'SV_POSITION':
+                if sem != 'SV_POSITION' and sem != 'SV_COVERAGE':
                     in_location += 1
                 if reference:
                     struct_declarations += [(macro, reference)]
