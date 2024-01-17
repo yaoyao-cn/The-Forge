@@ -385,6 +385,8 @@ def metal(fsl, dst):
                         attribute = '[[position]]'
                     elif 'SV_RENDERTARGETARRAYINDEX' in sem:
                         attribute = '[[render_target_array_index]]'
+                    elif 'SV_COVERAGE' in sem:
+                        attribute = '[[sample_mask]]'
                 shader_src += ['#line {}\n'.format(line_index)]
                 shader_src += [get_whitespace(line), dtype, ' ', name, ' ', attribute, ';\n']
                 continue
