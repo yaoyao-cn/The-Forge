@@ -466,8 +466,8 @@ int4   _to4(int2   x) { return int4(x, 0, 0); }
 int4   _to4(int    x) { return int4(x, 0, 0, 0); }
 
 
-#define LoadTex2DMS(NAME, SAMPLER, COORD, SMP) _to4(NAME.read( (COORD).xy, SMP ))
-#define LoadTex2DArrayMS(NAME, SAMPLER, COORD, SMP) _to4(NAME.read( (COORD).xyz, SMP ))
+#define LoadTex2DMS(NAME, SAMPLER, COORD, SMP) _to4(NAME.read( uint2((COORD).xy), SMP ))
+#define LoadTex2DArrayMS(NAME, SAMPLER, COORD, SMP) _to4(NAME.read( uint2((COORD).xy), uint((COORD).z), SMP ))
 #define SampleLvlTex2D(NAME, SAMPLER, COORD, LEVEL) _to4(NAME.sample(SAMPLER, COORD, level(LEVEL)))
 #define SampleTex2DProj(NAME, SAMPLER, COORD) _to4(NAME.sample(SAMPLER, float4(COORD).xy / float4(COORD).w))
 
