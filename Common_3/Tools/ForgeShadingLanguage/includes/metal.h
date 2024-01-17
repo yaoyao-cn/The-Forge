@@ -439,6 +439,8 @@ inline uint4 asuint(float4 X) { return as_type<uint4>(X); }
 #define Tex2DArray(ELEM_TYPE) texture2d_array<METAL_T(ELEM_TYPE), access::sample>
 #define Tex3DArray(ELEM_TYPE) texture3d_array<METAL_T(ELEM_TYPE), access::sample>
 
+#define Tex2DArrayMS(ELEM_TYPE, SMP_CNT) texture2d_ms_array<METAL_T(ELEM_TYPE), access::read>
+
 #define Depth2D(ELEM_TYPE) depth2d<METAL_T(ELEM_TYPE), access::sample>
 #define Depth2DMS(ELEM_TYPE, SMP_CNT) depth2d_ms<METAL_T(ELEM_TYPE), access::read>
 
