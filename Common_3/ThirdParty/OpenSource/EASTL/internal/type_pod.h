@@ -1812,8 +1812,12 @@ namespace eastl
 
 		template <typename T>
 		struct is_trivially_destructible // Can't use just __has_trivial_destructor(T) because some compilers give it slightly different meaning, and are just plain broken, such as VC++'s __has_trivial_destructor, which says false for fundamental types.
+			#if defined(__APPLE_CC__)
+			: public integral_constant<bool, eastl::is_destructible<T>::value && ((__is_trivially_destructible(T) && !eastl::is_hat_type<T>::value)|| eastl::is_scalar<typename eastl::remove_all_extents<T>::type>::value)> {};
+			#else
 			: public integral_constant<bool, eastl::is_destructible<T>::value && ((__has_trivial_destructor(T) && !eastl::is_hat_type<T>::value)|| eastl::is_scalar<typename eastl::remove_all_extents<T>::type>::value)> {};
-
+			
+			#endif
 	#else
 		#define EASTL_TYPE_TRAIT_is_trivially_destructible_CONFORMANCE 0
 
