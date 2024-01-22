@@ -134,8 +134,21 @@ unsigned WINAPI ThreadFunctionStatic(void* data)
 		// OS Thread name, for debugging purposes
 		WCHAR windowsThreadName[sizeof(item.mThreadName)] = { 0 };
 		mbstowcs(windowsThreadName, item.mThreadName, strlen(item.mThreadName) + 1);
-		HRESULT res = SetThreadDescription(GetCurrentThread(), windowsThreadName);
-		ASSERT(!FAILED(res));
+
+		// see: https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreaddescription
+        // Windows Server 2016, Windows 10 LTSB 2016 and Windows 10 version 1607: SetThreadDescription is only available by Run Time Dynamic Linking in KernelBase.dll.
+        HMODULE lib = LoadLibraryA("KernelBase.dll");
+        if (NULL != lib)
+        {
+            typedef HRESULT(WINAPI* fnSetThreadDescription)(HANDLE hThread, PCWSTR lpThreadDescription);
+			fnSetThreadDescription setThreadDescription = (fnSetThreadDescription)GetProcAddress(lib, "SetThreadDescription");
+			if (NULL != setThreadDescription)
+			{
+                HRESULT res = setThreadDescription(GetCurrentThread(), windowsThreadName);
+                ASSERT(!FAILED(res));
+            }
+            FreeLibrary(lib);
+        }
 #endif
 	}
 
