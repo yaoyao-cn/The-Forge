@@ -1634,7 +1634,8 @@ static HRESULT EnableExperimentalShaderModels()
 														  { 0xb2, 0x97, 0x81, 0xce, 0x9e, 0x18, 0x93, 0x3f }
 	};
 
-	return D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModelsID, NULL, NULL);
+    return E_NOINTERFACE;
+	//return D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModelsID, NULL, NULL);
 }
 #endif
 
