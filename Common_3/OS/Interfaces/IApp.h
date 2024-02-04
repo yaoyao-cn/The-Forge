@@ -80,6 +80,9 @@ void drawFrame(float deltaTime);
 #include "IOperatingSystem.h"
 #include "../../ThirdParty/OpenSource/EASTL/string.h"
 #include "ILog.h"
+#if defined(__ANDROID__)
+#include <android_native_app_glue.h>
+#endif
 
 class IApp
 {

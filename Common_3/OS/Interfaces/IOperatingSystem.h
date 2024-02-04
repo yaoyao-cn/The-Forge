@@ -42,7 +42,8 @@
 typedef uint64_t uint64;
 #endif
 #elif defined(__ANDROID__)
-#include <android_native_app_glue.h>
+#include <android/configuration.h>
+#include <android/native_activity.h>
 #include <android/log.h>
 #elif defined(__linux__) && !defined(VK_USE_PLATFORM_GGP)
 #define VK_USE_PLATFORM_XLIB_KHR
