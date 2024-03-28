@@ -4389,7 +4389,7 @@ void vk_addTexture(Renderer* pRenderer, const TextureDesc* pDesc, Texture** ppTe
 		VkFormatFeatureFlags format_features = util_vk_image_usage_to_format_features(add_info.usage);
 
 		VkFormatFeatureFlags flags = format_props.optimalTilingFeatures & format_features;
-		ASSERT((0 != flags) && "Format is not supported for GPU local images (i.e. not host visible images)");
+		ASSERT((format_features == flags) && "Format is not supported for GPU local images (i.e. not host visible images)");
 
 		const bool linkedMultiGpu = (pRenderer->mGpuMode == GPU_MODE_LINKED) && (pDesc->pSharedNodeIndices || pDesc->mNodeIndex);
 
