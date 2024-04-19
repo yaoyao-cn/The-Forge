@@ -34,6 +34,7 @@ def get_args():
     parser.add_argument('--compile', default=False, action='store_true')
     parser.add_argument('--rootSignature', default=None)
     parser.add_argument('--incremental', default=False, action='store_true')
+    parser.add_argument('--noAPISubFolder', help='do not seperate folders per render API', default=False, action='store_true')
     args = parser.parse_args()
     args.language = args.language.split()
     return args
@@ -67,15 +68,15 @@ def main():
 
     # Seperate folders per render API
     folder_map = {
-        Languages.DIRECT3D11:       "DIRECT3D11",
-        Languages.DIRECT3D12:       "DIRECT3D12",
-        Languages.VULKAN:           "VULKAN",
+        Languages.DIRECT3D11:       "" if args.noAPISubFolder else "DIRECT3D11",
+        Languages.DIRECT3D12:       "" if args.noAPISubFolder else "DIRECT3D12",
+        Languages.VULKAN:           "" if args.noAPISubFolder else "VULKAN",
         Languages.METAL:            "",
         Languages.ORBIS:            "",
         Languages.PROSPERO:         "",
-        Languages.XBOX :            "DIRECT3D12",
-        Languages.SCARLETT :        "DIRECT3D12",
-        Languages.GLES :            "GLES",
+        Languages.XBOX :            "" if args.noAPISubFolder else "DIRECT3D12",
+        Languages.SCARLETT :        "" if args.noAPISubFolder else "DIRECT3D12",
+        Languages.GLES :            "" if args.noAPISubFolder else "GLES",
     }
 
     if args.fsl_input.endswith('.h.fsl'):
