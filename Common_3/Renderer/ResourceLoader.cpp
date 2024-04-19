@@ -3223,6 +3223,7 @@ bool load_shader_stage_byte_code(
 #endif
 
 	eastl::string binaryShaderComponent = rendererApi + "_" + fileName +
+										  eastl::string().sprintf("_%zu", eastl::string_hash<eastl::string>()(loadDesc.pFileName)) +
 										  eastl::string().sprintf("_%zu", eastl::string_hash<eastl::string>()(shaderDefines)) + extension +
 										  eastl::string().sprintf("%u", target);
 #ifdef DIRECT3D11
