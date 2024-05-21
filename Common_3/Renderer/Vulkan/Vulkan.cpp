@@ -1909,20 +1909,20 @@ void util_find_queue_family_index(
 			break;
 		}
 		if ((queueFlags & requiredFlags) && ((queueFlags & ~requiredFlags) == 0) &&
-			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][queueFlags])
+			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
 		{
 			found = true;
 			queueFamilyIndex = index;
-			queueIndex = pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags];
+			queueIndex = pRenderer->mVulkan.pUsedQueueCount[nodeIndex][index];
 			break;
 		}
 		if (flagAnd && ((queueFlags - flagAnd) < minQueueFlag) && !graphicsQueue &&
-			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][queueFlags])
+			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
 		{
 			found = true;
 			minQueueFlag = (queueFlags - flagAnd);
 			queueFamilyIndex = index;
-			queueIndex = pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags];
+			queueIndex = pRenderer->mVulkan.pUsedQueueCount[nodeIndex][index];
 			break;
 		}
 	}
@@ -1934,11 +1934,11 @@ void util_find_queue_family_index(
 		{
 			VkQueueFlags queueFlags = queueFamilyProperties[index].queueFlags;
 			if ((queueFlags & requiredFlags) &&
-				pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][queueFlags])
+				pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
 			{
 				found = true;
 				queueFamilyIndex = index;
-				queueIndex = pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags];
+				queueIndex = pRenderer->mVulkan.pUsedQueueCount[nodeIndex][index];
 				break;
 			}
 		}
@@ -2888,14 +2888,12 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 	uint32_t                 queue_create_infos_count = 0;
 	VkDeviceQueueCreateInfo* queue_create_infos = (VkDeviceQueueCreateInfo*)alloca(queueFamiliesCount * sizeof(VkDeviceQueueCreateInfo));
 
-	const uint32_t maxQueueFlag =
-		VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT | VK_QUEUE_SPARSE_BINDING_BIT | VK_QUEUE_PROTECTED_BIT;
 	pRenderer->mVulkan.pAvailableQueueCount = (uint32_t**)tf_malloc(pRenderer->mLinkedNodeCount * sizeof(uint32_t*));
 	pRenderer->mVulkan.pUsedQueueCount = (uint32_t**)tf_malloc(pRenderer->mLinkedNodeCount * sizeof(uint32_t*));
 	for (uint32_t i = 0; i < pRenderer->mLinkedNodeCount; ++i)
 	{
-		pRenderer->mVulkan.pAvailableQueueCount[i] = (uint32_t*)tf_calloc(maxQueueFlag, sizeof(uint32_t));
-		pRenderer->mVulkan.pUsedQueueCount[i] = (uint32_t*)tf_calloc(maxQueueFlag, sizeof(uint32_t));
+		pRenderer->mVulkan.pAvailableQueueCount[i] = (uint32_t*)tf_calloc(queueFamiliesCount, sizeof(uint32_t));
+		pRenderer->mVulkan.pUsedQueueCount[i] = (uint32_t*)tf_calloc(queueFamiliesCount, sizeof(uint32_t));
 	}
 
 	for (uint32_t i = 0; i < queueFamiliesCount; i++)
@@ -2935,7 +2933,7 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 
 			for (uint32_t n = 0; n < pRenderer->mLinkedNodeCount; ++n)
 			{
-				pRenderer->mVulkan.pAvailableQueueCount[n][queueFamiliesProperties[i].queueFlags] = queueCount;
+				pRenderer->mVulkan.pAvailableQueueCount[n][i] = queueCount;
 			}
 		}
 	}
@@ -3535,7 +3533,7 @@ void vk_addQueue(Renderer* pRenderer, QueueDesc* pDesc, Queue** ppQueue)
 	uint8_t                 queueIndex = UINT8_MAX;
 
 	util_find_queue_family_index(pRenderer, nodeIndex, pDesc->mType, &queueProps, &queueFamilyIndex, &queueIndex);
-	++pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueProps.queueFlags];
+	++pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFamilyIndex];
 
 	Queue* pQueue = (Queue*)tf_calloc(1, sizeof(Queue));
 	ASSERT(pQueue);
@@ -3580,7 +3578,7 @@ void vk_removeQueue(Renderer* pRenderer, Queue* pQueue)
 
 	const uint32_t     nodeIndex = pRenderer->mGpuMode == GPU_MODE_LINKED ? pQueue->mNodeIndex : 0;
 	const VkQueueFlags queueFlags = pQueue->mVulkan.mFlags;
-	--pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags];
+	--pRenderer->mVulkan.pUsedQueueCount[nodeIndex][pQueue->mVulkan.mVkQueueFamilyIndex];
 
 	SAFE_FREE(pQueue);
 }
