@@ -1909,7 +1909,7 @@ void util_find_queue_family_index(
 			break;
 		}
 		if ((queueFlags & requiredFlags) && ((queueFlags & ~requiredFlags) == 0) &&
-			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
+			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][index] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
 		{
 			found = true;
 			queueFamilyIndex = index;
@@ -1917,7 +1917,7 @@ void util_find_queue_family_index(
 			break;
 		}
 		if (flagAnd && ((queueFlags - flagAnd) < minQueueFlag) && !graphicsQueue &&
-			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
+			pRenderer->mVulkan.pUsedQueueCount[nodeIndex][index] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
 		{
 			found = true;
 			minQueueFlag = (queueFlags - flagAnd);
@@ -1934,7 +1934,7 @@ void util_find_queue_family_index(
 		{
 			VkQueueFlags queueFlags = queueFamilyProperties[index].queueFlags;
 			if ((queueFlags & requiredFlags) &&
-				pRenderer->mVulkan.pUsedQueueCount[nodeIndex][queueFlags] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
+				pRenderer->mVulkan.pUsedQueueCount[nodeIndex][index] < pRenderer->mVulkan.pAvailableQueueCount[nodeIndex][index])
 			{
 				found = true;
 				queueFamilyIndex = index;
@@ -3577,7 +3577,6 @@ void vk_removeQueue(Renderer* pRenderer, Queue* pQueue)
 	ASSERT(pQueue);
 
 	const uint32_t     nodeIndex = pRenderer->mGpuMode == GPU_MODE_LINKED ? pQueue->mNodeIndex : 0;
-	const VkQueueFlags queueFlags = pQueue->mVulkan.mFlags;
 	--pRenderer->mVulkan.pUsedQueueCount[nodeIndex][pQueue->mVulkan.mVkQueueFamilyIndex];
 
 	SAFE_FREE(pQueue);
