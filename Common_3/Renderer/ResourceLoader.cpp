@@ -2735,7 +2735,11 @@ void vk_compileShader(
 	else
 	{
 		glslangValidator = (char*)tf_calloc(64, sizeof(char));
+#ifdef _WINDOWS
+		strcpy(glslangValidator, "glslangValidator");
+#else
 		strcpy(glslangValidator, "/usr/bin/glslangValidator");
+#endif
 	}
 
 	const char* args[1] = { commandLine.c_str() };
