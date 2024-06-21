@@ -347,7 +347,7 @@ public:
 			// Initialize breadcrumb buffer to write markers in it.
 			initMarkers();
 		}
-
+#if !defined(OHOS)
 		// Load fonts
 		FontDesc font = {};
 		font.pFontPath = "TitilliumText/TitilliumText-Bold.otf";
@@ -400,7 +400,7 @@ public:
 		for (uint32_t i = 0; i < numScripts; ++i)
 			scriptDescs[i].pScriptFileName = gWindowTestScripts[i];
 		luaDefineScripts(scriptDescs, numScripts);
-
+#endif
 		waitForAllResourceLoads();
 
 		// Setup planets (Rotation speeds are relative to Earth's, some values randomly given)
@@ -510,7 +510,7 @@ public:
 		pCameraController = initFpsCameraController(camPos, lookAt);
 
 		pCameraController->setMotionParameters(cmp);
-
+#if !defined(OHOS)
 		InputSystemDesc inputDesc = {};
 		inputDesc.pRenderer = pRenderer;
 		inputDesc.pWindow = pWindow;
@@ -555,6 +555,7 @@ public:
 		actionDesc = { InputBindings::BUTTON_NORTH, [](InputActionContext* ctx) { pCameraController->resetView(); return true; } };
 		addInputAction(&actionDesc);
 
+#endif
 		updateDescriptorSets();
 
 		gFrameIndex = 0; 
@@ -564,17 +565,18 @@ public:
 
 	void Exit()
 	{
+#if !defined(OHOS)
 		exitInputSystem();
-
+#endif
 		exitCameraController(pCameraController);
 
 		exitUserInterface();
-
+#if !defined(OHOS)
 		exitFontSystem();
 
 		// Exit profile
 		exitProfiler();
-
+#endif
 		if (pRenderer->pActiveGpuSettings->mGpuBreadcrumbs)
 		{
 			exitMarkers();
@@ -635,10 +637,10 @@ public:
 			pSwapChain->ppRenderTargets[0], 
 			pDepthBuffer 
 		};
-
+#if !defined(OHOS)
 		if (!addFontSystemPipelines(ppPipelineRenderTargets, 2, NULL))
 			return false;
-
+#endif
 		if (!addUserInterfacePipelines(ppPipelineRenderTargets[0]))
 			return false;
 
@@ -712,9 +714,9 @@ public:
 		waitQueueIdle(pGraphicsQueue);
 
 		removeUserInterfacePipelines();
-
+#if !defined(OHOS)
 		removeFontSystemPipelines();
-
+#endif
 		removePipeline(pRenderer, pSkyBoxDrawPipeline);
 		removePipeline(pRenderer, pSpherePipeline);
 
@@ -728,8 +730,9 @@ public:
 
 	void Update(float deltaTime)
 	{
+#if !defined(OHOS)
 		updateInputSystem(mSettings.mWidth, mSettings.mHeight);
-
+#endif
 		pCameraController->update(deltaTime);
 		/************************************************************************/
 		// Scene Update
