@@ -1,0 +1,14 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    }
+  ,{
+      "name": "EntryAbility_desc",
+      "value": "The Forge Test"
+    },{
+      "name": "EntryAbility_label",
+      "value": "The Forge Test"
+    }]
+}
