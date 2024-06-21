@@ -978,7 +978,7 @@ struct InputSystemImpl: public gainput::InputListener
 		pInputManager->SetDisplaySize(width, height);
 		pInputManager->Update();
 
-#if defined(__linux__) && !defined(__ANDROID__) && !defined(GAINPUT_PLATFORM_GGP)
+#if defined(__linux__) && !defined(__ANDROID__) && !defined(GAINPUT_PLATFORM_GGP) && !defined(__OHOS__) 
 		//this needs to be done before updating the events
 		//that way current frame data will be delta after resetting mouse position
 		if (mInputCaptured)

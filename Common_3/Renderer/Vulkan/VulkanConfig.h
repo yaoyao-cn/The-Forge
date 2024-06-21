@@ -36,6 +36,10 @@
 #ifndef VK_USE_PLATFORM_ANDROID_KHR
 #define VK_USE_PLATFORM_ANDROID_KHR
 #endif
+#elif defined(__OHOS__)
+#ifndef VK_USE_PLATFORM_OHOS
+#define VK_USE_PLATFORM_OHOS
+#endif
 #elif defined(__linux__) && !defined(VK_USE_PLATFORM_GGP)
 // TODO: Separate vulkan ext from choosing xlib vs xcb
 #define VK_USE_PLATFORM_XLIB_KHR    //Use Xlib or Xcb as display server, defaults to Xlib

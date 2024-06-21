@@ -139,6 +139,8 @@ public:
 
 #ifdef __ANDROID__
 		bool		mVSyncEnabled = true;
+#elif __OHOS__
+		bool		mVSyncEnabled = true;
 #else
 		bool		mVSyncEnabled = false;
 #endif
@@ -220,6 +222,20 @@ public:
 		IApp::argv = NULL;                                        \
 		appClass app;                                             \
 		AndroidMain(param, &app);                                 \
+	}
+
+#elif defined(__OHOS__)
+#define DEFINE_APPLICATION_MAIN(appClass)                         \
+	int IApp::argc;                                               \
+	const char** IApp::argv;                                      \
+	extern int OHOSMain(void *env, void *exports, IApp *app); \
+                                                                  \
+	void OHOS_main(void *env, void *exports)                  \
+	{                                                             \
+		IApp::argc = 0;                                           \
+		IApp::argv = NULL;                                        \
+		static appClass app;                                             \
+		OHOSMain(env, exports, &app);                         \
 	}
 
 #elif defined(__linux__)

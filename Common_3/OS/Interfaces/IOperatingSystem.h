@@ -45,6 +45,7 @@ typedef uint64_t uint64;
 #include <android/configuration.h>
 #include <android/native_activity.h>
 #include <android/log.h>
+#elif defined(__OHOS__)
 #elif defined(__linux__) && !defined(VK_USE_PLATFORM_GGP)
 #define VK_USE_PLATFORM_XLIB_KHR
 #if defined(VK_USE_PLATFORM_XLIB_KHR) || defined(VK_USE_PLATFORM_XCB_KHR)
@@ -121,6 +122,9 @@ typedef struct WindowHandle
 	ANativeWindow*           window;
 	ANativeActivity*         activity;
 	AConfiguration*			 configuration;
+#elif defined(__OHOS__)
+	void*           window;
+	void*         	component;
 #else
 	void* window;    //hWnd
 #endif
@@ -190,6 +194,13 @@ typedef struct
 	char              publicAdapterName[64];
 	char              publicDisplayName[64];
 #endif
+
+#elif defined(__OHOS__)
+	char             adapterName[32];
+	char             displayName[32];
+	char             publicAdapterName[64];
+	char             publicDisplayName[64];
+
 #elif defined(__linux__) && !defined(__ANDROID__)
 	Screen*          screen;
 	char             adapterName[32];
@@ -265,7 +276,7 @@ typedef enum ResetScenario
 void onRequestReload();
 void onDeviceLost();
 void onGpuModeSwitch();
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(__OHOS__)
 typedef enum ResetScenario
 {
 

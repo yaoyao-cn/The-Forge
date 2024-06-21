@@ -121,7 +121,7 @@ bool UnixOpenFile(ResourceDirectory resourceDir, const char* fileName, FileMode 
 	return true;
 }
 
-#if !defined(__ANDROID__) && !defined(ORBIS)
+#if !defined(__ANDROID__) && !defined(ORBIS)  && !defined(__OHOS__)
 bool PlatformOpenFile(ResourceDirectory resourceDir, const char* fileName, FileMode mode, FileStream* pOut)
 {
 	return UnixOpenFile(resourceDir, fileName, mode, pOut);

@@ -89,7 +89,7 @@ bool initCpuInfo(CpuInfo* outCpuInfo)
 	Aarch64Info info;
 
 	//ARM64 supported platforms by cpu_features
-#if defined(ANDROID) || defined(__LINUX__) || defined(TARGET_APPLE_ARM64)
+#if defined(ANDROID) || defined(__LINUX__) || defined(TARGET_APPLE_ARM64) || defined(OHOS)
 	result = GetAarch64Info(&info);
 #endif
 
