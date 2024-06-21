@@ -49,7 +49,7 @@
 #include "../OS/Interfaces/ILog.h"
 #include "../OS/Interfaces/IThread.h"
 
-#if defined(__ANDROID__) && defined(VULKAN)
+#if (defined(__ANDROID__) || defined(__OHOS__)) && defined(VULKAN)
 #include <shaderc/shaderc.h>
 #endif
 
@@ -108,7 +108,7 @@ extern RendererApi gSelectedRendererApi;
 // A simple memcpy suffices since the GPU memory is marked as CPU write combine
 #if defined(XBOX) || defined(ORBIS) || defined(PROSPERO) || defined(TARGET_APPLE_ARM64) || defined(NX64)
 static FORGE_CONSTEXPR const bool gUma = true;
-#elif defined(ANDROID)
+#elif defined(ANDROID) || defined(OHOS)
 #if defined(USE_MULTIPLE_RENDER_APIS)
 // Cant determine at compile time since we can be running GLES or VK. Not using UMA path for non VK
 static bool gUma = false;
@@ -896,7 +896,7 @@ static UploadFunctionResult loadTexture(Renderer* pRenderer, CopyEngine* pCopyEn
 
 		if (TEXTURE_CONTAINER_DEFAULT == container)
 		{
-#if defined(TARGET_IOS) || defined(__ANDROID__) || defined(NX64)
+#if defined(TARGET_IOS) || defined(__ANDROID__) || defined(NX64)||defined(__OHOS__) 
 			container = TEXTURE_CONTAINER_KTX;
 #elif defined(_WINDOWS) || defined(XBOX) || defined(__APPLE__) || defined(__linux__)
 			container = TEXTURE_CONTAINER_DDS;
@@ -2093,7 +2093,7 @@ static void addResourceLoader(Renderer** ppRenderers, uint32_t rendererCount, Re
 		pLoader->mDesc.mSingleThreaded = true;
 #endif
 
-#if defined(ANDROID) && defined(USE_MULTIPLE_RENDER_APIS)
+#if (defined(ANDROID)||defined(OHOS)) && defined(USE_MULTIPLE_RENDER_APIS)
 	gUma = gSelectedRendererApi == RENDERER_API_VULKAN;
 #endif
 
@@ -2598,7 +2598,7 @@ Semaphore* getLastSemaphoreCompleted(uint32_t nodeIndex)
 /************************************************************************/
 // Shader loading
 /************************************************************************/
-#if defined(__ANDROID__) && defined(VULKAN)
+#if (defined(__ANDROID__)|| defined(__OHOS__)) && defined(VULKAN)
 // Translate Vulkan Shader Type to shaderc shader type
 shaderc_shader_kind getShadercShaderType(ShaderStage type)
 {
@@ -2619,7 +2619,7 @@ shaderc_shader_kind getShadercShaderType(ShaderStage type)
 #endif
 
 #if defined(VULKAN)
-#if defined(__ANDROID__)
+#if defined(__ANDROID__)|| defined(__OHOS__)
 // Android:
 // Use shaderc to compile glsl to spirV
 void vk_compileShader(
@@ -3026,7 +3026,7 @@ static bool process_source_file(
 			fsCloseStream(&fHandle);
 		}
 
-#if defined(TARGET_IOS) || defined(ANDROID)
+#if defined(TARGET_IOS) || defined(ANDROID) || defined(OHOS)
 		// iOS doesn't have support for resolving user header includes in shader code
 		// when compiling with shader source using Metal runtime.
 		// https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/MTLBestPracticesGuide/FunctionsandLibraries.html
@@ -3267,7 +3267,7 @@ bool load_shader_stage_byte_code(
 #endif
 #if defined(VULKAN)
 			case RENDERER_API_VULKAN:
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(__OHOS__)
 				vk_compileShader(
 					pRenderer, stage, (uint32_t)code.size(), code.c_str(), binaryShaderComponent.c_str(), macroCount, pMacros, pOut,
 					loadDesc.pEntryPointName);

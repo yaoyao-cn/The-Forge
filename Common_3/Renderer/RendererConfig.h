@@ -44,7 +44,7 @@
 #include "Direct3D12/Direct3D12Config.h"
 #elif defined(__APPLE__)
 #include "Metal/MetalConfig.h"
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined(__OHOS__)
 #ifndef QUEST_VR
 //#include "OpenGLES/GLESConfig.h"
 #endif

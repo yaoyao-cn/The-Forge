@@ -250,6 +250,8 @@ const char* gVkWantedInstanceExtensions[] =
 	VK_KHR_XCB_SURFACE_EXTENSION_NAME,
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
 	VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_OHOS)
+	VK_OHOS_SURFACE_EXTENSION_NAME,
 #elif defined(VK_USE_PLATFORM_GGP)
 	VK_GGP_STREAM_DESCRIPTOR_SURFACE_EXTENSION_NAME,
 #elif defined(VK_USE_PLATFORM_VI_NN)
@@ -3763,6 +3765,13 @@ void vk_addSwapChain(Renderer* pRenderer, const SwapChainDesc* pDesc, SwapChain*
 	add_info.flags = 0;
 	add_info.window = pDesc->mWindowHandle.window;
 	CHECK_VKRESULT(vkCreateAndroidSurfaceKHR(pRenderer->mVulkan.pVkInstance, &add_info, &gVkAllocationCallbacks, &vkSurface));
+#elif defined(VK_USE_PLATFORM_OHOS)
+	DECLARE_ZERO(VkSurfaceCreateInfoOHOS, add_info);
+	add_info.sType = VK_STRUCTURE_TYPE_SURFACE_CREATE_INFO_OHOS;
+	add_info.pNext = NULL;
+	add_info.flags = 0;
+	add_info.window = static_cast<OHNativeWindow *>(pDesc->mWindowHandle.window);
+	CHECK_VKRESULT(vkCreateSurfaceOHOS(pRenderer->mVulkan.pVkInstance, &add_info, &gVkAllocationCallbacks, &vkSurface));
 #elif defined(VK_USE_PLATFORM_GGP)
 	extern VkResult ggpCreateSurface(VkInstance, VkSurfaceKHR * surface);
 	CHECK_VKRESULT(ggpCreateSurface(pRenderer->pVkInstance, &vkSurface));
@@ -4124,7 +4133,7 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_HOST_COHERENT)
 		vma_mem_reqs.requiredFlags |= VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
-#if defined(ANDROID) || defined(NX64)
+#if defined(ANDROID) || defined(NX64) || defined(OHOS) 
 	// UMA for Android and NX64 devices
 	if (vma_mem_reqs.usage != VMA_MEMORY_USAGE_GPU_TO_CPU)
 	{
@@ -7820,7 +7829,7 @@ void vk_getFenceStatus(Renderer* pRenderer, Fence* pFence, FenceStatus* pFenceSt
 TinyImageFormat vk_getRecommendedSwapchainFormat(bool hintHDR, bool hintSRGB)
 {
 	//TODO: figure out this properly. BGRA not supported on android
-#if !defined(VK_USE_PLATFORM_ANDROID_KHR) && !defined(VK_USE_PLATFORM_VI_NN)
+#if !defined(VK_USE_PLATFORM_ANDROID_KHR) && !defined(VK_USE_PLATFORM_VI_NN)&& !defined(VK_USE_PLATFORM_OHOS)  
 	if (hintSRGB)
 		return TinyImageFormat_B8G8R8A8_SRGB;
 	else

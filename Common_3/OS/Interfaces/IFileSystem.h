@@ -160,6 +160,8 @@ typedef struct FileStream
 		FILE*         pFile;
 #if defined(__ANDROID__)
 		AAsset*       pAsset;
+#elif defined(__OHOS__)
+		void *rawFile;
 #elif defined(NX64)
 		FileNX        mStruct;
 #endif

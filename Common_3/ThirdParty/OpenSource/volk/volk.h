@@ -1119,7 +1119,9 @@ extern PFN_vkGetAccelerationStructureDeviceAddressKHR vkGetAccelerationStructure
 extern PFN_vkGetDeviceAccelerationStructureCompatibilityKHR vkGetDeviceAccelerationStructureCompatibilityKHR;
 extern PFN_vkWriteAccelerationStructuresPropertiesKHR vkWriteAccelerationStructuresPropertiesKHR;
 #endif /* defined(VK_KHR_acceleration_structure) */
-#if defined(VK_KHR_android_surface)
+#if defined(VK_OHOS_surface)
+extern PFN_vkCreateSurfaceOHOS vkCreateSurfaceOHOS;
+#elif defined(VK_KHR_android_surface)
 extern PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHR;
 #endif /* defined(VK_KHR_android_surface) */
 #if defined(VK_KHR_bind_memory2)
