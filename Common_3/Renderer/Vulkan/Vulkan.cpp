@@ -7127,7 +7127,7 @@ void vk_cmdDrawIndexed(Cmd* pCmd, uint32_t index_count, uint32_t first_index, ui
 }
 
 void vk_cmdDrawIndexedInstanced(
-	Cmd* pCmd, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount, uint32_t firstInstance, uint32_t firstVertex)
+	Cmd* pCmd, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 {
 	ASSERT(pCmd);
 	ASSERT(VK_NULL_HANDLE != pCmd->mVulkan.pVkCmdBuf);
