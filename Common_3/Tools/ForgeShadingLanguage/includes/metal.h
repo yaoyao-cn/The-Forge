@@ -242,29 +242,21 @@ inline float2x2 setRow(inout(float2x2) M, in(float2) row, const uint i) { M[0][i
 #define setRow2(M, R) setRow(M, R, 2)
 #define setRow3(M, R) setRow(M, R, 3)
 
-
-void AtomicAdd(threadgroup atomic_uint& DEST, uint VALUE, thread uint& ORIGINAL_VALUE)
-{ ORIGINAL_VALUE = atomic_fetch_add_explicit(&(DEST), VALUE, memory_order_relaxed); }
-
+// AtomicAdd for uint
+void AtomicAdd(device uint& DEST, uint VALUE, thread uint& ORIGINAL_VALUE)
+{ ORIGINAL_VALUE = atomic_fetch_add_explicit((device atomic_uint*)&(DEST), VALUE, memory_order_relaxed); }
 void AtomicAdd(threadgroup uint& DEST, uint VALUE, thread uint& ORIGINAL_VALUE)
 { ORIGINAL_VALUE = atomic_fetch_add_explicit((threadgroup atomic_uint*)&(DEST), VALUE, memory_order_relaxed); }
+void AtomicAdd(device uint& DEST, uint VALUE, threadgroup uint& ORIGINAL_VALUE)
+{ ORIGINAL_VALUE = atomic_fetch_add_explicit((device atomic_uint*)&(DEST), VALUE, memory_order_relaxed); }
 
-void AtomicAdd(volatile device uint& DEST, uint VALUE, thread uint& ORIGINAL_VALUE)
-{ ORIGINAL_VALUE = atomic_fetch_add_explicit((volatile device atomic_uint*)&(DEST), VALUE, memory_order_relaxed); }
-
-void AtomicAdd(device atomic_uint& DEST, uint VALUE, threadgroup uint& ORIGINAL_VALUE)
-{ ORIGINAL_VALUE = atomic_fetch_add_explicit(&(DEST), VALUE, memory_order_relaxed); }
-
-void AtomicAdd(device atomic_uint& DEST, uint VALUE, thread uint& ORIGINAL_VALUE)
-{ ORIGINAL_VALUE = atomic_fetch_add_explicit(&(DEST), VALUE, memory_order_relaxed); }
-
-void AtomicAdd(device uint& DEST, threadgroup atomic_uint& VALUE, threadgroup atomic_uint& ORIGINAL_VALUE)
-{ 
-    uint index = atomic_load_explicit(&VALUE, memory_order_relaxed);
-    atomic_store_explicit(&ORIGINAL_VALUE, 
-        atomic_fetch_add_explicit((device atomic_uint*)&(DEST), index, memory_order_relaxed),
-        memory_order_relaxed);
-}
+// AtomicAdd for int
+void AtomicAdd(device int& DEST, int VALUE, thread int& ORIGINAL_VALUE)
+{ ORIGINAL_VALUE = atomic_fetch_add_explicit((device atomic_int*)&(DEST), VALUE, memory_order_relaxed); }
+void AtomicAdd(threadgroup int& DEST, int VALUE, thread int& ORIGINAL_VALUE)
+{ ORIGINAL_VALUE = atomic_fetch_add_explicit((threadgroup atomic_int*)&(DEST), VALUE, memory_order_relaxed); }
+void AtomicAdd(device int& DEST, int VALUE, threadgroup int& ORIGINAL_VALUE)
+{ ORIGINAL_VALUE = atomic_fetch_add_explicit((device atomic_int*)&(DEST), VALUE, memory_order_relaxed); }
 
 #define AtomicStore(DEST, VALUE) \
     atomic_store_explicit(&DEST, VALUE, memory_order_relaxed)
