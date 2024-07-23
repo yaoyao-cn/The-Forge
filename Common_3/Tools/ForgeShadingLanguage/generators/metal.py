@@ -560,12 +560,13 @@ def metal(fsl, dst):
 
                 reference_arg = '\n#ifdef ' + macro + '\n'
                 if not isArray(resName):
-                    reference_arg += 'thread ' + resType + '& ' + resName
                     if 'Buffer' in resType:
                         space = 'constant'
                         if 'RW' in resType:
                             space = 'device'
                         reference_arg += space + ' ' + resType + '* ' + resName
+                    else:
+                        reference_arg += 'thread ' + resType + '& ' + resName
                 else:
                     array = resName[resName.find('['):]
                     reference_arg += 'thread ' + resType + '(&' + baseName+') ' + array
