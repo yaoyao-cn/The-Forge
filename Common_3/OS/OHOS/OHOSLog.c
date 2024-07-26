@@ -8,7 +8,7 @@
 // interfaces
 
 #include "../Interfaces/ILog.h"
-//解决命名空间冲突问题
+//瑙ｅ喅鍛藉悕绌洪棿鍐茬獊闂
 #define LogLevel  OHOS_LogLevel  
 #define LOG_DEBUG OHOS_LOG_DEBUG 
 #define LOG_INFO  OHOS_LOG_INFO  
@@ -26,7 +26,6 @@
 #undef LOG_FATAL 
 
 #include <assert.h>
-#include "../Interfaces/IMemory.h"
 #include <signal.h>
 
 void _OutputDebugStringV(const char *str, va_list args)

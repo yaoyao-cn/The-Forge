@@ -4,8 +4,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <rawfile/raw_file_manager.h>
-#include "../Interfaces/IMemory.h"
-#include "../../ThirdParty/OpenSource/EASTL/string.h"
 
 bool UnixOpenFile(ResourceDirectory resourceDir, const char *fileName, FileMode mode, FileStream *pOut);
 
