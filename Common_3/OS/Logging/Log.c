@@ -281,7 +281,7 @@ void writeLog(uint32_t level, const char* filename, int line_number, const char*
 				pCallback != gLogger.pCallbacks + gLogger.mCallbacksSize;
 				++pCallback)
 			{
-				if (pCallback->mLevel & log_levels[i])
+				if (pCallback->mLevel & logLevelPrefixes[log_levels[i]].first)
 					pCallback->mCallback(pCallback->mUserData, gLogBuffer);
 			}
 		}
