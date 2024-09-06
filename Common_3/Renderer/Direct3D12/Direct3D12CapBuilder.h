@@ -45,7 +45,8 @@ inline void d3d12_utils_caps_builder(Renderer* pRenderer)
 		pRenderer->mD3D12.pDxDevice->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &formatSupport, sizeof(formatSupport));
 		pRenderer->pCapBits->canShaderReadFrom[i] = (formatSupport.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE) != 0;
 		pRenderer->pCapBits->canShaderWriteTo[i] = (formatSupport.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE) != 0;
-		pRenderer->pCapBits->canRenderTargetWriteTo[i] = (formatSupport.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET)  != 0;
+		pRenderer->pCapBits->canRenderTargetWriteTo[i] = (formatSupport.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET)  != 0 ||
+			                                             (formatSupport.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL) != 0;
 	}
 }
 #endif
