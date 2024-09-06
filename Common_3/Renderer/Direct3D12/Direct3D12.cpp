@@ -3716,7 +3716,7 @@ void d3d12_compileShader(
 		// Create blob from the string
 		/************************************************************************/
 		IDxcBlobEncoding* pTextBlob;
-		CHECK_HRESULT(pLibrary->CreateBlobWithEncodingFromPinned((LPBYTE)code, (UINT32)codeSize, 0, &pTextBlob));
+		CHECK_HRESULT(pLibrary->CreateBlobWithEncodingFromPinned((LPBYTE)code, (UINT32)codeSize, CP_UTF8, &pTextBlob));
 		IDxcOperationResult* pResult;
 		WCHAR                filename[FS_MAX_PATH] = {};
 		char                 pathStr[FS_MAX_PATH] = { 0 };
