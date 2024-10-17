@@ -4108,15 +4108,32 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
 
 	VmaAllocationCreateInfo vma_mem_reqs = {};
 	vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO; // (VmaMemoryUsage)pDesc->mMemoryUsage;
-	if(pDesc->mMemoryUsage == RESOURCE_MEMORY_USAGE_CPU_TO_GPU)
+	switch (pDesc->mMemoryUsage)
+	{
+	case RESOURCE_MEMORY_USAGE_CPU_ONLY:
+		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
-	if(pDesc->mMemoryUsage == RESOURCE_MEMORY_USAGE_GPU_TO_CPU)
+		break;
+	case RESOURCE_MEMORY_USAGE_GPU_ONLY:
+		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+		break;
+	case RESOURCE_MEMORY_USAGE_CPU_TO_GPU:
+		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO;
+		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+		break;
+	case RESOURCE_MEMORY_USAGE_GPU_TO_CPU:
+		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO;
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+		break;
+	default:
+		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO;
+		break;
+	}
 
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_OWN_MEMORY_BIT)
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT)
-		vma_mem_reqs.flags |= (VMA_ALLOCATION_CREATE_MAPPED_BIT | VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT);
+		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
 	if (linkedMultiGpu)
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_DONT_BIND_BIT;
 	if (pDesc->mFlags & BUFFER_CREATION_FLAG_HOST_VISIBLE)
@@ -4126,7 +4143,7 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
 
 #if defined(ANDROID) || defined(NX64)
 	// UMA for Android and NX64 devices
-	if (vma_mem_reqs.usage != VMA_MEMORY_USAGE_GPU_TO_CPU)
+	if (pDesc->mMemoryUsage != RESOURCE_MEMORY_USAGE_GPU_TO_CPU)
 	{
 		vma_mem_reqs.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
