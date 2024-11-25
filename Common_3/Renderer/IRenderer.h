@@ -2651,7 +2651,7 @@ typedef struct SwapChain
         RenderTarget** ppFragmentDensityMasks;
     } mVR;
 #endif
-	uint32_t mImageCount : 3;
+	uint32_t mImageCount : 7;
 	uint32_t mEnableVsync : 1;
 } SwapChain;
 
