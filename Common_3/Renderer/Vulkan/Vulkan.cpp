@@ -7806,7 +7806,11 @@ void vk_waitForFences(Renderer* pRenderer, uint32_t fenceCount, Fence** ppFences
 		ppFences[i]->mVulkan.mSubmitted = false;
 }
 
-void vk_waitQueueIdle(Queue* pQueue) { vkQueueWaitIdle(pQueue->mVulkan.pVkQueue); }
+void vk_waitQueueIdle(Queue* pQueue)
+{
+	MutexLock lock(*pQueue->mVulkan.pSubmitMutex);
+	vkQueueWaitIdle(pQueue->mVulkan.pVkQueue);
+}
 
 void vk_getFenceStatus(Renderer* pRenderer, Fence* pFence, FenceStatus* pFenceStatus)
 {
