@@ -3246,6 +3246,7 @@ DECLARE_RENDERER_FUNCTION(void, cmdDrawInstanced, Cmd* pCmd, uint32_t vertexCoun
 DECLARE_RENDERER_FUNCTION(void, cmdDrawIndexed, Cmd* p_cmd, uint32_t index_count, uint32_t first_index, uint32_t first_vertex)
 DECLARE_RENDERER_FUNCTION(void, cmdDrawIndexedInstanced, Cmd* pCmd, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
 DECLARE_RENDERER_FUNCTION(void, cmdDispatch, Cmd* p_cmd, uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z)
+DECLARE_RENDERER_FUNCTION(void, cmdUpdateBuffer, Cmd* pCmd, Buffer* pBuffer, uint64_t dstOffset, Buffer* pSrcBuffer, uint64_t srcOffset, uint64_t size)
 
 // Transition Commands
 DECLARE_RENDERER_FUNCTION(void, cmdResourceBarrier, Cmd* p_cmd, uint32_t buffer_barrier_count, BufferBarrier* p_buffer_barriers, uint32_t texture_barrier_count, TextureBarrier* p_texture_barriers, uint32_t rt_barrier_count, RenderTargetBarrier* p_rt_barriers)
