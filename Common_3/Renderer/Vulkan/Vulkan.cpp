@@ -4115,7 +4115,7 @@ void vk_addBuffer(Renderer* pRenderer, const BufferDesc* pDesc, Buffer** ppBuffe
 		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 		break;
 	case RESOURCE_MEMORY_USAGE_CPU_TO_GPU:
-		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO;
+		vma_mem_reqs.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
 		vma_mem_reqs.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
 		break;
 	case RESOURCE_MEMORY_USAGE_GPU_TO_CPU:
