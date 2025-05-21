@@ -125,7 +125,6 @@ bool initFileSystem(FileSystemInitDesc *pDesc)
 
 void exitFileSystem()
 {
-	OH_ResourceManager_ReleaseNativeResourceManager(pAssetManager);
 	gInitialized = false;
 }
 
