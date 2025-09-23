@@ -72,7 +72,8 @@
 // Start vertex attribute bindings at index 30 and decrement so we can bind regular buffers from index 0 for simplicity
 #define VERTEX_BINDING_OFFSET (MAX_BUFFER_BINDINGS - 1)
 #define DESCRIPTOR_UPDATE_FREQ_PADDING 0
-#define BUILTIN_DRAW_ID_BINDING_INDEX (DESCRIPTOR_UPDATE_FREQ_COUNT)
+// conflict with push constant binding index
+// #define BUILTIN_DRAW_ID_BINDING_INDEX (DESCRIPTOR_UPDATE_FREQ_COUNT)
 
 VkAllocationCallbacks gMtlAllocationCallbacks = {
 	// pUserData
@@ -4436,8 +4437,9 @@ void mtl_cmdExecuteIndirect(
 					id           indexBuffer = pCmd->mSelectedIndexBuffer;
 					MTLIndexType indexType = (MTLIndexType)pCmd->mIndexType;
 					uint64_t     indirectBufferOffset = offset + pCommandSignature->mStride * i;
-					[pCmd->mtlRenderEncoder setVertexBytes:&i length:sizeof(i) atIndex:BUILTIN_DRAW_ID_BINDING_INDEX];      // drawId
-					[pCmd->mtlRenderEncoder setFragmentBytes:&i length:sizeof(i) atIndex:BUILTIN_DRAW_ID_BINDING_INDEX];    // drawId
+					// conflict with push constant binding index
+					// [pCmd->mtlRenderEncoder setVertexBytes:&i length:sizeof(i) atIndex:BUILTIN_DRAW_ID_BINDING_INDEX];      // drawId
+					// [pCmd->mtlRenderEncoder setFragmentBytes:&i length:sizeof(i) atIndex:BUILTIN_DRAW_ID_BINDING_INDEX];    // drawId
 
 					[pCmd->mtlRenderEncoder drawIndexedPrimitives:(MTLPrimitiveType)pCmd->mSelectedPrimitiveType
 														indexType:indexType
