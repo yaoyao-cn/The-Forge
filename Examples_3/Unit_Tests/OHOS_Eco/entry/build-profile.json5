@@ -22,7 +22,7 @@
         }
       },"nativeLib": {
         "debugSymbol": {
-          "strip": true,
+          "strip": false,
           "exclude": []
         }
       }
