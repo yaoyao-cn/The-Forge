@@ -2784,6 +2784,7 @@ typedef struct GPUSettings
 	uint32_t            mMaxRootSignatureDWORDS;
     uint32_t            mWaveLaneCount;
     uint8_t             mDeviceUUID[16];
+	uint8_t             mDeviceLUID[8];  // Local Unique Identifier (valid on Windows, zeros on other platforms)
 	WaveOpsSupportFlags mWaveOpsSupportFlags;
 	GPUVendorPreset     mGpuVendorPreset;
 	// Variable Rate Shading

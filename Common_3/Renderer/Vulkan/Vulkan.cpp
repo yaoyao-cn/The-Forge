@@ -2062,6 +2062,7 @@ void util_query_gpu_settings(VkPhysicalDevice gpu, VkPhysicalDeviceProperties2* 
 
 	*gpuSettings = {};
 	memcpy(gpuSettings->mDeviceUUID, idProperties.deviceUUID, VK_UUID_SIZE);
+	memcpy(gpuSettings->mDeviceLUID, idProperties.deviceLUID, VK_LUID_SIZE);
 	gpuSettings->mUniformBufferAlignment = (uint32_t)gpuProperties->properties.limits.minUniformBufferOffsetAlignment;
 	gpuSettings->mUploadBufferTextureAlignment = (uint32_t)gpuProperties->properties.limits.optimalBufferCopyOffsetAlignment;
 	gpuSettings->mUploadBufferTextureRowAlignment = (uint32_t)gpuProperties->properties.limits.optimalBufferCopyRowPitchAlignment;
