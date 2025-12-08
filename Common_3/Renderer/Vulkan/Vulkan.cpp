@@ -2067,6 +2067,7 @@ void util_query_gpu_settings(VkPhysicalDevice gpu, VkPhysicalDeviceProperties2* 
 	gpuSettings->mUploadBufferTextureAlignment = (uint32_t)gpuProperties->properties.limits.optimalBufferCopyOffsetAlignment;
 	gpuSettings->mUploadBufferTextureRowAlignment = (uint32_t)gpuProperties->properties.limits.optimalBufferCopyRowPitchAlignment;
 	gpuSettings->mMaxVertexInputBindings = gpuProperties->properties.limits.maxVertexInputBindings;
+	gpuSettings->mMaxStageTextures = gpuProperties->properties.limits.maxPerStageDescriptorSampledImages;
 	gpuSettings->mMultiDrawIndirect = gpuFeatures->features.multiDrawIndirect;
 
 	gpuSettings->mWaveLaneCount = subgroupProperties.subgroupSize;

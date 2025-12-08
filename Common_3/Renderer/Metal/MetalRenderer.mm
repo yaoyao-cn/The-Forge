@@ -1874,6 +1874,7 @@ void mtl_initRenderer(const char* appName, const RendererDesc* settings, Rendere
 			}
 
 			LOGF(LogLevel::eINFO, "Metal: Max Arg Buffer Textures: %u", gpuSettings[0].mArgumentBufferMaxTextures);
+			gpuSettings[0].mMaxStageTextures = gpuSettings[0].mArgumentBufferMaxTextures;
 		}
 #endif
 
