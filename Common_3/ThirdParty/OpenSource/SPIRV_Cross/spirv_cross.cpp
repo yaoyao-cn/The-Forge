@@ -1838,6 +1838,16 @@ size_t Compiler::get_declared_struct_member_size(const SPIRType &struct_type, ui
 		break;
 	}
 
+	// [TEMP FIX] Handle PhysicalStorageBuffer pointers (buffer device address).
+	// This fix is backported from newer SPIRV-Cross versions.
+	// PhysicalStorageBuffer pointers are always 64-bit (8 bytes).
+	if (type.pointer && type.storage == spv::StorageClassPhysicalStorageBufferEXT)
+	{
+		// Check if this is a top-level pointer type, and not an array of pointers.
+		if (type.pointer_depth > get<SPIRType>(type.parent_type).pointer_depth)
+			return 8;
+	}
+
 	if (!type.array.empty())
 	{
 		// For arrays, we can use ArrayStride to get an easy check.
