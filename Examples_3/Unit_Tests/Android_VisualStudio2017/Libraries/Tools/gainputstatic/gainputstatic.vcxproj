@@ -72,6 +72,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="..\..\..\AGDEVersions.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Android-arm64-v8a'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -80,7 +81,6 @@
     <AndroidMinSdkVersion>26</AndroidMinSdkVersion>
     <CLanguageStandard>c99</CLanguageStandard>
     <CppLanguageStandard>cpp14</CppLanguageStandard>
-    <AndroidNdkVersion>21.4.7075529</AndroidNdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Android-arm64-v8a'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -91,7 +91,6 @@
     <AndroidMinSdkVersion>26</AndroidMinSdkVersion>
     <CLanguageStandard>c99</CLanguageStandard>
     <CppLanguageStandard>cpp14</CppLanguageStandard>
-    <AndroidNdkVersion>21.4.7075529</AndroidNdkVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />

@@ -52,7 +52,7 @@
     <CLanguageStandard>c99</CLanguageStandard>
     <CppLanguageStandard>cpp14</CppLanguageStandard>
     <UseOfStl>cpp_shared</UseOfStl>
-    <AndroidNdkVersion>21.4.7075529</AndroidNdkVersion>
+    <AndroidNdkVersion>25.2.9519653</AndroidNdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Android-arm64-v8a'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -64,7 +64,7 @@
     <CLanguageStandard>c99</CLanguageStandard>
     <CppLanguageStandard>cpp14</CppLanguageStandard>
     <UseOfStl>cpp_shared</UseOfStl>
-    <AndroidNdkVersion>21.4.7075529</AndroidNdkVersion>
+    <AndroidNdkVersion>25.2.9519653</AndroidNdkVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />

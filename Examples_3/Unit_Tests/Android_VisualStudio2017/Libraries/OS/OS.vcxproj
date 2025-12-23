@@ -195,6 +195,7 @@
     <RootNamespace>OS</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="..\..\AGDEVersions.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Android-arm64-v8a'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -204,7 +205,6 @@
     <CLanguageStandard>c99</CLanguageStandard>
     <CppLanguageStandard>cpp14</CppLanguageStandard>
     <UseOfStl>cpp_shared</UseOfStl>
-    <AndroidNdkVersion>21.4.7075529</AndroidNdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Android-arm64-v8a'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -216,7 +216,6 @@
     <CLanguageStandard>c99</CLanguageStandard>
     <CppLanguageStandard>cpp14</CppLanguageStandard>
     <UseOfStl>cpp_shared</UseOfStl>
-    <AndroidNdkVersion>21.4.7075529</AndroidNdkVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -249,7 +248,6 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>ANDROID_ARM_NEON</PreprocessorDefinitions>
-      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -275,7 +273,6 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>ANDROID_ARM_NEON</PreprocessorDefinitions>
-      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
