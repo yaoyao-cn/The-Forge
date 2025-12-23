@@ -707,8 +707,10 @@ inline int2 GetDimensions(TextureCube t, SamplerState smp) { return GetDimension
 
 #if defined(DIRECT3D11)
     #define Tex2DMS(ELEM_TYPE, SMP_CNT) Texture2DMS<ELEM_TYPE>
+    #define Tex2DArrayMS(ELEM_TYPE, SMP_CNT) Texture2DMSArray<ELEM_TYPE>
 #else
     #define Tex2DMS(ELEM_TYPE, SMP_CNT) Texture2DMS<ELEM_TYPE, SMP_CNT>
+    #define Tex2DArrayMS(ELEM_TYPE, SMP_CNT) Texture2DMSArray<ELEM_TYPE, SMP_CNT>
 #endif
 
 #define Tex1DArray(ELEM_TYPE) Texture1DArray<ELEM_TYPE>
