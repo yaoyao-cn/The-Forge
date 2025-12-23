@@ -13,6 +13,40 @@
     #extension GL_EXT_multiview : require
 #endif
 
+/************************************************************************/
+// Buffer Reference (Buffer Device Address)
+/************************************************************************/
+#if VK_BUFFER_DEVICE_ADDRESS_ENABLED
+    #extension GL_EXT_buffer_reference : require
+    #extension GL_EXT_buffer_reference2 : require
+    #extension GL_EXT_scalar_block_layout : require
+
+    // Buffer reference declaration macros
+    // Declare buffer reference types, then use them directly in PUSH_CONSTANT.
+    // The buffer reference type itself acts as a 64-bit pointer internally.
+    //
+    // Usage example:
+    //   // 1. Declare buffer reference type
+    //   BUFFER_REF_RO(MatrixRef) { float4x4 matrix; };
+    //
+    //   // 2. Use buffer reference type in push constant (cross-platform)
+    //   PUSH_CONSTANT(PushConstants, b0)
+    //   {
+    //       DATA(BUFFER_REF_TYPE(MatrixRef), sceneData, None);
+    //       DATA(BUFFER_REF_TYPE(MatrixRef), modelData, None);
+    //   };
+    //
+    //   // 3. Access data through buffer reference
+    //   float4x4 mvp = Get(sceneData).matrix;
+    //
+    #define BUFFER_REF(NAME) layout(buffer_reference, scalar) buffer NAME
+    #define BUFFER_REF_RO(NAME) layout(buffer_reference, scalar) readonly buffer NAME
+    #define BUFFER_REF_ALIGN(NAME, ALIGN) layout(buffer_reference, scalar, buffer_reference_align = ALIGN) buffer NAME
+
+    // Cross-platform pointer type macro - on Vulkan, buffer reference type IS the pointer type
+    #define BUFFER_REF_TYPE(NAME) NAME
+#endif
+
 #define f4(X) vec4(X)
 #define f3(X) vec3(X)
 #define f2(X) vec2(X)

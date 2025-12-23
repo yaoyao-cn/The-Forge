@@ -567,6 +567,35 @@ bool any(float3 x) { return any(x!= 0.0f); }
 #define SET_OUTPUT_FORMAT(FMT)
 #define PS_ZORDER_EARLYZ()
 
+/************************************************************************/
+// Buffer Reference (Buffer Device Address) - Metal 3+
+/************************************************************************/
+#if MTL_BUFFER_DEVICE_ADDRESS_ENABLED
+    // Buffer reference declaration macros
+    // Declare buffer reference types, then use BUFFER_REF_TYPE in PUSH_CONSTANT.
+    //
+    // Usage example:
+    //   // 1. Declare buffer reference type (defines a struct)
+    //   BUFFER_REF_RO(MatrixRef) { float4x4 matrix; };
+    //
+    //   // 2. Use buffer reference type in push constant (cross-platform)
+    //   PUSH_CONSTANT(PushConstants, b0)
+    //   {
+    //       DATA(BUFFER_REF_TYPE(MatrixRef), sceneData, None);
+    //       DATA(BUFFER_REF_TYPE(MatrixRef), modelData, None);
+    //   };
+    //
+    //   // 3. Access data through buffer reference (same as Vulkan)
+    //   float4x4 mvp = Get(sceneData).matrix;
+    //
+    #define BUFFER_REF(NAME) struct NAME
+    #define BUFFER_REF_RO(NAME) struct NAME
+    #define BUFFER_REF_ALIGN(NAME, ALIGN) struct NAME
+
+    // Cross-platform pointer type macro - on Metal, returns device pointer type
+    #define BUFFER_REF_TYPE(NAME) device NAME*
+#endif
+
 #ifndef STAGE_VERT
     #define VR_VIEW_ID(VID) (0)
 #else

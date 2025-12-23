@@ -6456,6 +6456,17 @@ void d3d12_setPipelineName(Renderer* pRenderer, Pipeline* pPipeline, const char*
 	pPipeline->mD3D12.pDxPipelineState->SetName(wName);
 #endif
 }
+
+/************************************************************************/
+// Buffer Device Address
+/************************************************************************/
+uint64_t d3d12_getBufferDeviceAddress(Renderer* pRenderer, Buffer* pBuffer)
+{
+	ASSERT(pRenderer);
+	ASSERT(pBuffer);
+
+	return pBuffer->mD3D12.pDxResource->GetGPUVirtualAddress();
+}
 /************************************************************************/
 // Virtual Texture
 /************************************************************************/
@@ -7187,6 +7198,10 @@ void initD3D12Renderer(const char* appName, const RendererDesc* pSettings, Rende
 	setTextureName = d3d12_setTextureName;
 	setRenderTargetName = d3d12_setRenderTargetName;
 	setPipelineName = d3d12_setPipelineName;
+	/************************************************************************/
+	// Buffer Device Address Interface
+	/************************************************************************/
+	getBufferDeviceAddress = d3d12_getBufferDeviceAddress;
 
 	d3d12_initRenderer(appName, pSettings, ppRenderer);
 }

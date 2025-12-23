@@ -2018,6 +2018,15 @@ void mtl_initRenderer(const char* appName, const RendererDesc* settings, Rendere
 		// Create default resources.
 		add_default_resources(pRenderer);
 
+		// Check for buffer device address support (Metal 3+)
+		bool bufferDeviceAddressSupported = false;
+		if (@available(macOS 13.0, iOS 16.0, *))
+		{
+			bufferDeviceAddressSupported = true;
+		}
+		static char bufferDeviceAddressMacroBuffer[2] = {};
+		sprintf(bufferDeviceAddressMacroBuffer, "%u", bufferDeviceAddressSupported ? 1 : 0);
+
 		ShaderMacro rendererShaderDefines[] = {
 			{ "UPDATE_FREQ_NONE", "0" },
 			{ "UPDATE_FREQ_PER_FRAME", "1" },
@@ -2025,6 +2034,7 @@ void mtl_initRenderer(const char* appName, const RendererDesc* settings, Rendere
 			{ "UPDATE_FREQ_PER_DRAW", "3" },
 			{ "UPDATE_FREQ_USER", "4" },
 			{ "MAX_BUFFER_BINDINGS", "31" },
+			{ "MTL_BUFFER_DEVICE_ADDRESS_ENABLED", bufferDeviceAddressMacroBuffer },
 #ifdef TARGET_IOS
 			{ "TARGET_IOS", "" },
 #endif
@@ -4979,6 +4989,21 @@ void mtl_setRenderTargetName(Renderer* pRenderer, RenderTarget* pRenderTarget, c
 }
 
 void mtl_setPipelineName(Renderer*, Pipeline*, const char*) {}
+
+/************************************************************************/
+// Buffer Device Address
+/************************************************************************/
+uint64_t mtl_getBufferDeviceAddress(Renderer* pRenderer, Buffer* pBuffer)
+{
+	ASSERT(pRenderer);
+	ASSERT(pBuffer);
+
+	if (@available(macOS 13.0, iOS 16.0, *))
+	{
+		return pBuffer->mtlBuffer.gpuAddress;
+	}
+	return 0;
+}
 // -------------------------------------------------------------------------------------------------
 // Utility functions
 // -------------------------------------------------------------------------------------------------
@@ -5865,6 +5890,10 @@ void initMetalRenderer(const char* appName, const RendererDesc* pSettings, Rende
 	setTextureName = mtl_setTextureName;
 	setRenderTargetName = mtl_setRenderTargetName;
 	setPipelineName = mtl_setPipelineName;
+	/************************************************************************/
+	// Buffer Device Address Interface
+	/************************************************************************/
+	getBufferDeviceAddress = mtl_getBufferDeviceAddress;
 
 	mtl_initRenderer(appName, pSettings, ppRenderer);
 }

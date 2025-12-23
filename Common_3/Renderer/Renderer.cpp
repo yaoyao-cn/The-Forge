@@ -145,6 +145,10 @@ setBufferNameFn					setBufferName;
 setTextureNameFn				setTextureName;
 setRenderTargetNameFn			setRenderTargetName;
 setPipelineNameFn				setPipelineName;
+/************************************************************************/
+// Buffer Device Address Interface
+/************************************************************************/
+getBufferDeviceAddressFn		getBufferDeviceAddress;
 
 /************************************************************************/
 // IRay Interface

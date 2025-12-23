@@ -4262,6 +4262,11 @@ void gl_setPipelineName(Renderer* pRenderer, Pipeline* pPipeline, const char* pN
 #endif
 }
 
+/************************************************************************/
+// Buffer Device Address - Not supported in GLES
+/************************************************************************/
+uint64_t gl_getBufferDeviceAddress(Renderer*, Buffer*) { return 0; }
+
 bool gl_isRaytracingSupported(Renderer* pRenderer)
 {
 	// Unavailable in OpenGL ES 2.0
@@ -4397,6 +4402,10 @@ void initGLESRenderer(const char* appName, const RendererDesc* pSettings, Render
 	setTextureName = gl_setTextureName;
 	setRenderTargetName = gl_setRenderTargetName;
 	setPipelineName = gl_setPipelineName;
+	/************************************************************************/
+	// Buffer Device Address Interface
+	/************************************************************************/
+	getBufferDeviceAddress = gl_getBufferDeviceAddress;
 
 	/************************************************************************/
 	// IRay Interface

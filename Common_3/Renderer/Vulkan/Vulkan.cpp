@@ -347,12 +347,17 @@ const char* gVkWantedDeviceExtensions[] =
         VK_KHR_MAINTENANCE3_EXTENSION_NAME,
 #endif
 	/************************************************************************/
+	// Buffer Device Address
+	/************************************************************************/
+#if VK_KHR_buffer_device_address
+	VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+#endif
+	/************************************************************************/
 	// Raytracing
 	/************************************************************************/
 #ifdef VK_RAYTRACING_AVAILABLE
 	VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
-	VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-	VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME, 
+	VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
 
 	VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
 	VK_KHR_SPIRV_1_4_EXTENSION_NAME,
@@ -1493,6 +1498,12 @@ VkBufferUsageFlags util_to_vk_buffer_usage(DescriptorType usage, bool typed)
 	{
 		result |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
 	}
+#if VK_KHR_buffer_device_address
+	if (usage & DESCRIPTOR_TYPE_SHADER_DEVICE_ADDRESS)
+	{
+		result |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+	}
+#endif
 #ifdef VK_RAYTRACING_AVAILABLE
 	if (usage & DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE)
 	{
@@ -1501,10 +1512,6 @@ VkBufferUsageFlags util_to_vk_buffer_usage(DescriptorType usage, bool typed)
 	if (usage & DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_BUILD_INPUT)
 	{
 		result |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
-	}
-	if (usage & DESCRIPTOR_TYPE_SHADER_DEVICE_ADDRESS)
-	{
-		result |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
 	}
 	if (usage & DESCRIPTOR_TYPE_SHADER_BINDING_TABLE)
 	{
@@ -2749,16 +2756,18 @@ static bool AddDevice(const RendererDesc* pDesc, Renderer* pRenderer)
 						if (strcmp(wantedDeviceExtensions[k], VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) == 0)
 							pRenderer->mVulkan.mDescriptorIndexingExtension = true;
 #endif
+#if VK_KHR_buffer_device_address
+						if (strcmp(wantedDeviceExtensions[k], VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) == 0)
+							pRenderer->mVulkan.mBufferDeviceAddressExtension = 1;
+#endif
 #ifdef VK_RAYTRACING_AVAILABLE
 						// KHRONOS VULKAN RAY TRACING
-						uint32_t khrRaytracingSupported = 1; 
+						uint32_t khrRaytracingSupported = 1;
 
 						if (strcmp(wantedDeviceExtensions[k], VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME) == 0)
 							pRenderer->mVulkan.mShaderFloatControlsExtension = 1;
 						khrRaytracingSupported &= pRenderer->mVulkan.mShaderFloatControlsExtension;
 
-						if (strcmp(wantedDeviceExtensions[k], VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) == 0)
-							pRenderer->mVulkan.mBufferDeviceAddressExtension = 1;
 						khrRaytracingSupported &= pRenderer->mVulkan.mBufferDeviceAddressExtension;
 
 						if (strcmp(wantedDeviceExtensions[k], VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) == 0)
@@ -3359,11 +3368,14 @@ void vk_initRenderer(const char* appName, const RendererDesc* pDesc, Renderer** 
 	// Set shader macro based on runtime information
 	static char descriptorIndexingMacroBuffer[2] = {};
 	static char textureArrayDynamicIndexingMacroBuffer[2] = {};
+	static char bufferDeviceAddressMacroBuffer[2] = {};
 	sprintf(descriptorIndexingMacroBuffer, "%u", (uint32_t)(pRenderer->mVulkan.mDescriptorIndexingExtension));
 	sprintf(textureArrayDynamicIndexingMacroBuffer, "%u", (uint32_t)(gpuFeatures.features.shaderSampledImageArrayDynamicIndexing));
+	sprintf(bufferDeviceAddressMacroBuffer, "%u", (uint32_t)(pRenderer->mVulkan.mBufferDeviceAddressExtension));
 	static ShaderMacro rendererShaderDefines[] = {
 		{ "VK_EXT_DESCRIPTOR_INDEXING_ENABLED", descriptorIndexingMacroBuffer },
 		{ "VK_FEATURE_TEXTURE_ARRAY_DYNAMIC_INDEXING_ENABLED", textureArrayDynamicIndexingMacroBuffer },
+		{ "VK_BUFFER_DEVICE_ADDRESS_ENABLED", bufferDeviceAddressMacroBuffer },
 		// Descriptor set indices
 		{ "UPDATE_FREQ_NONE", "set = 0" },
 		{ "UPDATE_FREQ_PER_FRAME", "set = 1" },
@@ -8256,6 +8268,25 @@ void vk_setPipelineName(Renderer* pRenderer, Pipeline* pPipeline, const char* pN
 #endif
 	}
 }
+
+/************************************************************************/
+// Buffer Device Address
+/************************************************************************/
+uint64_t vk_getBufferDeviceAddress(Renderer* pRenderer, Buffer* pBuffer)
+{
+	ASSERT(pRenderer);
+	ASSERT(pBuffer);
+
+#if VK_KHR_buffer_device_address
+	if (pRenderer->mVulkan.mBufferDeviceAddressExtension)
+	{
+		VkBufferDeviceAddressInfo bufferInfo = { VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO };
+		bufferInfo.buffer = pBuffer->mVulkan.pVkBuffer;
+		return vkGetBufferDeviceAddressKHR(pRenderer->mVulkan.pVkDevice, &bufferInfo);
+	}
+#endif
+	return 0;
+}
 /************************************************************************/
 // Virtual Texture
 /************************************************************************/
@@ -9073,6 +9104,10 @@ void initVulkanRenderer(const char* appName, const RendererDesc* pSettings, Rend
 	setTextureName = vk_setTextureName;
 	setRenderTargetName = vk_setRenderTargetName;
 	setPipelineName = vk_setPipelineName;
+	/************************************************************************/
+	// Buffer Device Address Interface
+	/************************************************************************/
+	getBufferDeviceAddress = vk_getBufferDeviceAddress;
 
 	vk_initRenderer(appName, pSettings, ppRenderer);
 }

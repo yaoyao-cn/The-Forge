@@ -827,4 +827,13 @@ inline int2 GetDimensions(TextureCube t, SamplerState smp) { return GetDimension
 #endif
 #define VR_MULTIVIEW_COUNT 1
 
+/************************************************************************/
+// Buffer Device Address - D3D12
+// Note: D3D12 supports GetGPUVirtualAddress() on CPU side but HLSL has
+// no native pointer syntax like Vulkan's buffer_reference or Metal's
+// device pointers. The BUFFER_REF/BUFFER_REF_TYPE macros are NOT
+// available for D3D12. For buffer device address functionality on D3D12,
+// use ByteAddressBuffer with offset-based access as an alternative.
+/************************************************************************/
+
 #endif // _D3D_H

@@ -4251,6 +4251,11 @@ void d3d11_setRenderTargetName(Renderer* pRenderer, RenderTarget* pRenderTarget,
 }
 
 void d3d11_setPipelineName(Renderer*, Pipeline*, const char*) {}
+
+/************************************************************************/
+// Buffer Device Address - Not supported in D3D11
+/************************************************************************/
+uint64_t d3d11_getBufferDeviceAddress(Renderer*, Buffer*) { return 0; }
 #endif
 
 void initD3D11Renderer(const char* appName, const RendererDesc* pSettings, Renderer** ppRenderer)
@@ -4381,6 +4386,10 @@ void initD3D11Renderer(const char* appName, const RendererDesc* pSettings, Rende
 	setTextureName = d3d11_setTextureName;
 	setRenderTargetName = d3d11_setRenderTargetName;
 	setPipelineName = d3d11_setPipelineName;
+	/************************************************************************/
+	// Buffer Device Address Interface
+	/************************************************************************/
+	getBufferDeviceAddress = d3d11_getBufferDeviceAddress;
 
 	d3d11_initRenderer(appName, pSettings, ppRenderer);
 }
