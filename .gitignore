@@ -69,3 +69,12 @@ Tools/ShaderBuildCommand/packages/
 # Android build outputs
 **/Android-arm64-v8a/
 **/Android-x86_64/
+
+# macOS
+.DS_Store
+
+# Xcode
+**/xcuserdata/
+
+# Generated Shaders (macOS Xcode build output)
+Examples_3/Unit_Tests/macOS Xcode/The-Forge/Shaders/
