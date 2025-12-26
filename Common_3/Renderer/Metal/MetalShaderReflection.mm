@@ -127,6 +127,8 @@ int getSizeFromDataType(MTLDataType dataType)
 		case MTLDataTypeUInt2: return INT_SIZE * 2;
 		case MTLDataTypeUInt3: return INT_SIZE * 3;
 		case MTLDataTypeUInt4: return INT_SIZE * 4;
+		case MTLDataTypeLong: return 8;
+		case MTLDataTypeULong: return 8;
 		case MTLDataTypeShort: return HALF_SIZE;
 		case MTLDataTypeShort2: return HALF_SIZE * 2;
 		case MTLDataTypeShort3: return HALF_SIZE * 3;

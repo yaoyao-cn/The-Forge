@@ -568,32 +568,39 @@ bool any(float3 x) { return any(x!= 0.0f); }
 #define PS_ZORDER_EARLYZ()
 
 /************************************************************************/
-// Buffer Reference (Buffer Device Address) - Metal 3+
+// Buffer Device Address - Metal 3+
 /************************************************************************/
 #if MTL_BUFFER_DEVICE_ADDRESS_ENABLED
-    // Buffer reference declaration macros
-    // Declare buffer reference types, then use BUFFER_REF_TYPE in PUSH_CONSTANT.
+    // Buffer Device Address macros for passing GPU addresses through push constants.
+    // Provides a unified API that works consistently across Vulkan and Metal.
     //
     // Usage example:
-    //   // 1. Declare buffer reference type (defines a struct)
-    //   BUFFER_REF_RO(MatrixRef) { float4x4 matrix; };
+    //   // 1. Define your struct
+    //   STRUCT(SceneData) { DATA(float4x4, viewProj, None); };
     //
-    //   // 2. Use buffer reference type in push constant (cross-platform)
-    //   PUSH_CONSTANT(PushConstants, b0)
+    //   // 2. Declare buffer address type (creates SceneData_Addr as typedef for uint64_t)
+    //   DECLARE_BUFFER_ADDRESS(SceneData);
+    //
+    //   // 3. Use in push constant
+    //   PUSH_CONSTANT(PC, b0)
     //   {
-    //       DATA(BUFFER_REF_TYPE(MatrixRef), sceneData, None);
-    //       DATA(BUFFER_REF_TYPE(MatrixRef), modelData, None);
+    //       DATA(BUFFER_ADDRESS(SceneData), sceneAddr, None);
     //   };
     //
-    //   // 3. Access data through buffer reference (same as Vulkan)
-    //   float4x4 mvp = Get(sceneData).matrix;
+    //   // 4. Access data through BREF macro
+    //   // Single struct: use index 0
+    //   float4x4 vp = BREF(Get(sceneAddr), SceneData, 0).viewProj;
+    //   // Array access: use variable index
+    //   InstanceData inst = BREF(Get(instancesAddr), InstanceData, i);
     //
-    #define BUFFER_REF(NAME) struct NAME
-    #define BUFFER_REF_RO(NAME) struct NAME
-    #define BUFFER_REF_ALIGN(NAME, ALIGN) struct NAME
-
-    // Cross-platform pointer type macro - on Metal, returns device pointer type
-    #define BUFFER_REF_TYPE(NAME) device NAME*
+    // Nested addresses (array of addresses) are also supported:
+    //   DECLARE_BUFFER_ADDRESS(SceneData);
+    //   DECLARE_BUFFER_ADDRESS(SceneData_Addr);  // SceneData_Addr_Addr
+    //
+    #define DECLARE_BUFFER_ADDRESS(TYPE) typedef uint64_t TYPE##_Addr
+    #define DECLARE_BUFFER_ADDRESS_RW(TYPE) typedef uint64_t TYPE##_Addr
+    #define BUFFER_ADDRESS(TYPE) TYPE##_Addr
+    #define BREF(ADDR, TYPE, IDX) (((device TYPE*)(ADDR))[IDX])
 #endif
 
 #ifndef STAGE_VERT
