@@ -51,6 +51,13 @@
     #define DECLARE_BUFFER_ADDRESS_RW(TYPE) layout(buffer_reference, scalar) buffer TYPE##_Addr { TYPE v[]; }
     #define BUFFER_ADDRESS(TYPE) TYPE##_Addr
     #define BREF(ADDR, TYPE, IDX) (ADDR).v[IDX]
+#else
+    // Fallback definitions when BDA is not enabled - allows shader code to compile
+    // Note: These are placeholder definitions. BREF access will not work at runtime.
+    #define DECLARE_BUFFER_ADDRESS(TYPE) struct TYPE##_Addr { uvec2 _addr; }
+    #define DECLARE_BUFFER_ADDRESS_RW(TYPE) struct TYPE##_Addr { uvec2 _addr; }
+    #define BUFFER_ADDRESS(TYPE) TYPE##_Addr
+    #define BREF(ADDR, TYPE, IDX) TYPE(0)
 #endif
 
 #define f4(X) vec4(X)

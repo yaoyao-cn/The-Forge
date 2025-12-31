@@ -568,40 +568,14 @@ bool any(float3 x) { return any(x!= 0.0f); }
 #define PS_ZORDER_EARLYZ()
 
 /************************************************************************/
-// Buffer Device Address - Metal 3+
+// Buffer Device Address - Metal
+// Metal's device pointer syntax is always available. BDA functionality
+// requires Metal 3+ at runtime, but shader code can compile on all versions.
 /************************************************************************/
-#if MTL_BUFFER_DEVICE_ADDRESS_ENABLED
-    // Buffer Device Address macros for passing GPU addresses through push constants.
-    // Provides a unified API that works consistently across Vulkan and Metal.
-    //
-    // Usage example:
-    //   // 1. Define your struct
-    //   STRUCT(SceneData) { DATA(float4x4, viewProj, None); };
-    //
-    //   // 2. Declare buffer address type (creates SceneData_Addr as typedef for uint64_t)
-    //   DECLARE_BUFFER_ADDRESS(SceneData);
-    //
-    //   // 3. Use in push constant
-    //   PUSH_CONSTANT(PC, b0)
-    //   {
-    //       DATA(BUFFER_ADDRESS(SceneData), sceneAddr, None);
-    //   };
-    //
-    //   // 4. Access data through BREF macro
-    //   // Single struct: use index 0
-    //   float4x4 vp = BREF(Get(sceneAddr), SceneData, 0).viewProj;
-    //   // Array access: use variable index
-    //   InstanceData inst = BREF(Get(instancesAddr), InstanceData, i);
-    //
-    // Nested addresses (array of addresses) are also supported:
-    //   DECLARE_BUFFER_ADDRESS(SceneData);
-    //   DECLARE_BUFFER_ADDRESS(SceneData_Addr);  // SceneData_Addr_Addr
-    //
-    #define DECLARE_BUFFER_ADDRESS(TYPE) typedef uint64_t TYPE##_Addr
-    #define DECLARE_BUFFER_ADDRESS_RW(TYPE) typedef uint64_t TYPE##_Addr
-    #define BUFFER_ADDRESS(TYPE) TYPE##_Addr
-    #define BREF(ADDR, TYPE, IDX) (((device TYPE*)(ADDR))[IDX])
-#endif
+#define DECLARE_BUFFER_ADDRESS(TYPE) typedef uint64_t TYPE##_Addr
+#define DECLARE_BUFFER_ADDRESS_RW(TYPE) typedef uint64_t TYPE##_Addr
+#define BUFFER_ADDRESS(TYPE) TYPE##_Addr
+#define BREF(ADDR, TYPE, IDX) (((device TYPE*)(ADDR))[IDX])
 
 #ifndef STAGE_VERT
     #define VR_VIEW_ID(VID) (0)
