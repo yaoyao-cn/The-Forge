@@ -453,11 +453,6 @@ PFN_vkCmdDrawIndexedIndirectCountAMD pfnVkCmdDrawIndexedIndirectCountKHR = NULL;
 /************************************************************************/
 #if defined(RENDERER_IMPLEMENTATION)
 
-#if !defined(VK_USE_DISPATCH_TABLES)
-#ifdef _MSC_VER
-#pragma comment(lib, "vulkan-1.lib")
-#endif
-#endif
 
 #define SAFE_FREE(p_var)       \
 	if (p_var)                 \
